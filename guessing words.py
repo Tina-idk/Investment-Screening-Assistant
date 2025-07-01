@@ -9,9 +9,12 @@ st.write("3. If the letter is in the word, it will be displayed")
 st.write("4. If the letter is not in the word, you will lose a life")
 st.write("Good luck!")
 
-words = pd.read_csv('A2_1000_Vocabulary.csv')
-words = words[['Word', 'Meaning']]. dropna
-word_list = {word: Meaning for word, Meaning in zip(words['Word'], words['Meaning'])}
+def load_words():
+    df = pd.read_csv('A2_1000_Vocabulary.csv')
+    df = df[['Word', 'Meaning']].dropna()
+    return {row['Word']: row['Meaning'] for _, row in df.iterrows()}
+
+word_list = load_words()
 
 if "word" not in st.session_state:
     st.session_state.word = random.choice(list(word_list.keys()))
