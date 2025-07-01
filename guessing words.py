@@ -32,10 +32,10 @@ st.write(f"Letters guessed: {', '.join(st.session_state.letters_guessed)}")
 letter = st.text_input("Guess a letter: ", max_chars=1, key="current_guess")
 
 if st.button("Submit Guess"):
-    letter = st.session_state.current_guess.strip()
+    letter = st.session_state.current_guess.strip().lower()
 
-    if not letter.isalpha():
-        st.warning("Please enter a valid letter.")
+    if not letter.isalpha() or len(letter) != 1:
+        st.warning("Please enter a valid single letter.")
     elif letter in st.session_state.letters_guessed:
         st.warning("You've already guessed that letter.")
     else:
@@ -45,10 +45,12 @@ if st.button("Submit Guess"):
             for i, c in enumerate(st.session_state.word):
                 if c == letter:
                     st.session_state.guess[i] = letter
-            st.success("Correct guess!")
+            st.success("✅ Correct guess!")
         else:
             st.session_state.life -= 1
-            st.error("Wrong guess!")
+            st.error("❌ Wrong guess!")
+
+    st.experimental_rerun()
 
 if '_' not in st.session_state.guess:
     st.success("🎉 You win!")
