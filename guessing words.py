@@ -10,6 +10,7 @@ st.markdown("""
 4. If not, you lose a life  
 """)
 
+@st.cache_data
 def load_words():
     df = pd.read_csv('A2_1000_Vocabulary.csv')
     df = df[['Word', 'Meaning']].dropna()
@@ -31,6 +32,9 @@ st.write(f"Letters guessed: {', '.join(st.session_state.letters_guessed)}")
 letter = st.text_input("Guess a letter: ", max_chars=1, key="current_guess")
 
 if st.button("Submit Guess"):
+    letter = st.session_state.current_guess.strip()
+    st.session_state.current_guess = ""  
+
     if not letter.isalpha():
         st.warning("Please enter a valid letter.")
     elif letter in st.session_state.letters_guessed:
