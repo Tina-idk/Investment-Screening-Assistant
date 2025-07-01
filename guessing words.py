@@ -50,6 +50,7 @@ if st.button("Submit Guess"):
             st.session_state.life -= 1
             st.error("❌ Wrong guess!")
             
+    st.rerun()
     st.session_state.current_guess = ""
     st.rerun()
 
