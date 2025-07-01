@@ -11,7 +11,7 @@ st.write("Good luck!")
 words = pd.read_csv('A2_1000_Vocabulary.csv')
 words = words[['Word', 'Meaning']]
 words = words.dropna(subset=['Word', 'Meaning'])
-word_list = {word: paraphrase for word, Meaning in zip(words['Word'], words['Meaning'])}
+word_list = {word: Meaning for word, Meaning in zip(words['Word'], words['Meaning'])}
 
 while True:
     life = 10
@@ -39,12 +39,12 @@ while True:
         if life == 0:
             st.error('Game over!')
             st.write(f'The answer: {word}')
-            st.write(f'Paraphrase: {Meaning}')
+            st.write(f'Meaning: {Meaning}')
             break
     else:
         st.success('Congratulations, you win!')
         st.write(f'The answer: {word}')
-        st.write(f'Paraphrase: {Meaning}')
+        st.write(f'Meaning: {Meaning}')
 
     if st.button("Continue"):
         continue
