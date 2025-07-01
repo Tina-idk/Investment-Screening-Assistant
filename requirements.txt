@@ -4,5 +4,5 @@ python-dotenv
 PyMuPDF
 python-pptx
 pandas
-matlibplot
+matplotlib
 numpy
