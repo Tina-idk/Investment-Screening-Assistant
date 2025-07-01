@@ -144,3 +144,20 @@ if uploaded_file:
             st.markdown(score_response)
     else:
         st.error("Unsupported file type or empty content.")
+
+if "records" not in st.session_state:
+    st.session_state["records"] = []
+if st.button("Save Result"):
+    st.session_state["records"].append({
+        "filename": uploaded_file.name,
+        "overview": intro_response,
+        "score": score_response,
+    })
+    st.success("Result saved!")
+st.subheader("Saved Analyses")
+for idx, record in enumerate(st.session_state["records"]):
+    with st.expander(f"{idx+1}. {record['filename']}"):
+        st.markdown("**Company Overview:**")
+        st.write(record["overview"])
+        st.markdown("**Score Table:**")
+        st.markdown(record["score"])
