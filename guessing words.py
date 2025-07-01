@@ -51,8 +51,6 @@ if st.button("Submit Guess"):
             st.error("❌ Wrong guess!")
             
     st.rerun()
-    st.session_state.current_guess = ""
-    st.rerun()
 
 if '_' not in st.session_state.guess:
     st.success("🎉 You win!")
