@@ -58,6 +58,52 @@ def analyze_with_ai(text):
     {final_input}
     """
     intro_response = model.generate_content(intro_prompt).text
+    
+    SEIS_promt = f"""
+    Please assess whether the following company meets the eligibility criteria for the UK Enterprise Investment Scheme (EIS).
+    Evaluate each criterion separately and respond with:
+    ✅ Yes / ❌ No / ⚠️ Uncertain
+    
+    Criterion:
+    UK-registered company
+    Age ≤ 2 years
+    Assets ≤ £350, 000
+    Employees ≤ 25
+    Risk-to-capital condition
+    Business operates in a qualifying trade (not financial, real estate, energy generation, etc.)
+    Funds will be used for eligible business purposes (not repaying debt or buying companies)
+        
+    Return as markdown table, with columns Criterion, Status, Explanation.
+    Conclude whether the company is likely to qualify for EIS.
+    
+    Content:
+    {final_input}
+    """
+    SEIS_response = model.generate_content(SEIS_promt).text
+
+    EIS_promt = f"""
+    Please assess whether the following company meets the eligibility criteria for the UK Enterprise Investment Scheme (EIS).
+    
+    Evaluate each criterion separately and respond with:
+    ✅ Yes / ❌ No / ⚠️ Uncertain
+    
+    Criterion:
+    UK-registered company
+    Unlisted (or listed on AIM)
+    Age ≤ 7 years
+    Assets ≤ £15 million
+    Employees ≤ 250
+    Risk-to-capital condition
+    Business operates in a qualifying trade (not financial, real estate, energy generation, etc.)
+    Funds will be used for eligible business purposes (not repaying debt or buying companies)
+    
+    Return as markdown table, with columns Criterion, Status, Explanation.
+    Conclude whether the company is likely to qualify for EIS.
+    
+    Content:
+    {final_input}
+    """
+    EIS_response = model.generate_content(EIS_promt).text
 
     score_prompt = f"""
     Evaluate the company based on these criteria:
@@ -78,7 +124,7 @@ def analyze_with_ai(text):
     """
     score_response = model.generate_content(score_prompt).text
 
-    return intro_response, score_response
+    return intro_response, SEIS_response, EIS_response, score_response
 
 # Output
 if uploaded_file:
@@ -87,9 +133,13 @@ if uploaded_file:
         st.text_area("Document Preview", content[:2000])
         if st.button("Analyze with AI"):
             with st.spinner("Analyzing..."):
-                intro_response, score_response = analyze_with_ai(content)
+                intro_response, SEIS_response, EIS_response, score_response = analyze_with_ai(content)
             st.subheader("Company Overview")
             st.write(intro_response)
+            st.subheader("SEIS Judgement")
+            st.markdown(SEIS_response)
+            st.subheader("EIS Judgement")
+            st.markdown(EIS_response)
             st.subheader("Investment Criteria Evaluation")
             st.markdown(score_response)
     else:
