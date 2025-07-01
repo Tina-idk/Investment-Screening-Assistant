@@ -33,7 +33,6 @@ letter = st.text_input("Guess a letter: ", max_chars=1, key="current_guess")
 
 if st.button("Submit Guess"):
     letter = st.session_state.current_guess.strip()
-    st.session_state.current_guess = ""  
 
     if not letter.isalpha():
         st.warning("Please enter a valid letter.")
