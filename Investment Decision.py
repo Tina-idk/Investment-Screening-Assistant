@@ -3,9 +3,7 @@ st.title("Investment Screening Assistant")
 st.write("Upload company documents and let AI help evaluate whether the business meets your investment criteria!")
 uploaded_file = st.file_uploader("Upload company profile, pitch deck, or business plan", type=["pdf", "pptx"])
 
-from dotenv import load_dotenv
 import os
-load_dotenv()
 
 # Text Extraction
 def extract_text(uploaded_file):
@@ -28,7 +26,7 @@ def extract_text(uploaded_file):
 
 # AI Analysis
 import google.generativeai as genai
-genai.configure(api_key=os.getenv("API"))
+genai.configure(api_key=os.environ(API))
 def analyze_with_ai(text):
     model = genai.GenerativeModel(model_name="gemini-1.5-flash")
     def split_text(text, chunk_size=3000):
