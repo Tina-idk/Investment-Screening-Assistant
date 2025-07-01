@@ -3,11 +3,12 @@ import pandas as pd
 import streamlit as st
 st.title("Game: Word Guessing Game")
 st.write("Game Rule: ")
-st.write("1. Try to guess the word in limited trials(10)")
-st.write("2. Enter one letter each time")
-st.write("3. If the letter is in the word, it will be displayed")
-st.write("4. If the letter is not in the word, you will lose a life")
-st.write("Good luck!")
+st.markdown("""
+1. Try to guess the word in limited trials (10)
+2. Enter one letter each time  
+3. If the letter is in the word, it will be displayed  
+4. If not, you lose a life  
+""")
 
 def load_words():
     df = pd.read_csv('A2_1000_Vocabulary.csv')
