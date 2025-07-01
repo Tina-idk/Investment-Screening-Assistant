@@ -19,10 +19,12 @@ while True:
     paraphrase = word_list.get(word)[0]
     length = len(word)
     guess = ['_'] * length
-    st.write(guess)
+    st.write(' '.join(guess))
 
+    i = 0
     while '_' in guess:
-        letter = st.text_input('Guess a letter: ')
+        letter = st.text_input('Guess a letter: ', key=f"guess_input_{i}")
+        i += 1
         if not letter.isalpha():
             st.warning('Please enter a letter!')
             continue
