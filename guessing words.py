@@ -49,7 +49,8 @@ if st.button("Submit Guess"):
         else:
             st.session_state.life -= 1
             st.error("❌ Wrong guess!")
-
+            
+    st.session_state.current_guess = ""
     st.rerun()
 
 if '_' not in st.session_state.guess:
