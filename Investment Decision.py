@@ -46,15 +46,15 @@ def generate_multi_comparison_conclusion(records):
     
 def parse_score_table_to_df(markdown_table_str):
     import pandas as pd
-    from io import StringIO
-
     lines = markdown_table_str.strip().splitlines()
     table_lines = [line for line in lines if line.strip().startswith("|") and "---" not in line]
     if len(table_lines) < 2:
         return pd.DataFrame()
-
-    csv_str = "\n".join([line.strip().strip("|").replace(" | ", ",") for line in table_lines[1:]])
-    df = pd.read_csv(StringIO(csv_str), names=["Criteria", "Score", "Explanation"])
+    rows = []
+    for line in table_lines[1:]:  
+        parts = [part.strip() for part in line.strip().strip("|").split("|")]
+        rows.append(parts[:3])
+    df = pd.DataFrame(rows, columns=["Criteria", "Score", "Explanation"])
     return df
 
 def extract_scores_only(markdown_table_str):
