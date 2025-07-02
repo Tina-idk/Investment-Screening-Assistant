@@ -57,6 +57,10 @@ def parse_score_table_to_df(markdown_table_str):
     df = pd.read_csv(StringIO(csv_str), names=["Criteria", "Score", "Explanation"])
     return df
 
+def extract_scores_only(markdown_table_str):
+    df = parse_score_table_to_df(markdown_table_str)
+    return df.set_index("Criteria")["Score"]
+
 
 # AI Analysis
 import google.generativeai as genai
@@ -245,7 +249,7 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         records = [st.session_state["records"][i] for i in indices]
         score_dict = {}
         for record in records:
-            score_dict[record["filename"]] = parse_score_table_to_df(record["score"]) 
+            score_dict[record["filename"]] = extract_scores_only(record["score"]) 
         df = pd.DataFrame(score_dict)
         df.index.name = "Criteria"
         st.markdown("### Score Table Comparison")
