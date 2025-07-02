@@ -21,6 +21,29 @@ def extract_text(uploaded_file):
         return text
     else:
         return "Unsupported file type."
+        
+def generate_comparison_conclusion(score1_md, score2_md, name1, name2):
+    model = genai.GenerativeModel(model_name="gemini-1.5-flash")
+    
+    prompt = f"""
+    Compare the following two companies based on their investment scores.
+    Each has been evaluated based on: Product, Team, Financial Assessment, Market Attractiveness, Exit Potential.
+
+    Company 1 ({name1}):
+    {score1_md}
+
+    Company 2 ({name2}):
+    {score2_md}
+
+    Write a short conclusion (3–5 sentences) explaining:
+    - Which company performs better overall
+    - Their respective strengths and weaknesses
+    - Which one is more suitable for investment (if clear)
+
+    Be concise and objective.
+    """
+    response = model.generate_content(prompt, generation_config={"temperature": 0})
+    return response.text
 
 # AI Analysis
 import google.generativeai as genai
@@ -201,8 +224,8 @@ if len(st.session_state["records"]) >= 2:
     with col2:
         st.markdown(f"**{rec2['filename']}**")
         st.markdown(rec2["score"])
-
-if st.button("Generate Comparison Summary"):
+    if idx1 != idx2:
+        if st.button("Generate Comparison Summary"):
     conclusion = generate_comparison_conclusion(
         st.session_state["records"][idx1]["score"],
         st.session_state["records"][idx2]["score"],
