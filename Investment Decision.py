@@ -215,34 +215,31 @@ if st.session_state.get("analysis_done", False):
             st.session_state["records"] = st.session_state["records"][-MAX_RECORDS:]
         st.success("Result saved!")
 
-options = [f"{i+1}. {record['filename']}" for i, record in enumerate(st.session_state["records"])]
+if "records" in st.session_state and len(st.session_state["records"]) > 0:
+    options = [f"{i+1}. {record['filename']}" for i, record in enumerate(st.session_state["records"])]
+    default_selection = options[:2] if len(options) >= 2 else options
 
-if len(options) >= 2:
     selected = st.multiselect(
-        "Select companies to compare (up to 10)", 
-        options, 
-        default=[options[0], options[1]],
+        "Select companies to compare (up to 10)",
+        options,
+        default=default_selection,
         max_selections=10
     )
 
-if len(selected) >= 2:
-    indices = [int(s.split(".")[0]) - 1 for s in selected]
-    records = [st.session_state["records"][i] for i in indices]
+    if len(selected) >= 2:
+        indices = [int(s.split(".")[0]) - 1 for s in selected]
+        records = [st.session_state["records"][i] for i in indices]
 
-    st.markdown("### Score Table Comparison")
-    cols = st.columns(len(records))
-    for i, col in enumerate(cols):
-        with col:
-            st.markdown(f"**{records[i]['filename']}**")
-            st.markdown(records[i]["score"])
-    conclusion = generate_comparison_conclusion(
-    st.session_state["records"][idx1]["score"],
-    st.session_state["records"][idx2]["score"],
-    choice1,
-    choice2
-    )
-    st.subheader("AI Summary Conclusion")
-    st.write(conclusion)
+        st.markdown("###Score Table Comparison")
+        cols = st.columns(len(records))
+        for i, col in enumerate(cols):
+            with col:
+                st.markdown(f"**{records[i]['filename']}**")
+                st.markdown(records[i]["score"])
+
+else:
+    st.info("Please upload at least one company file.")
+
 
 if st.button("Clear All Saved Analyses"):
     st.session_state["records"] = []
