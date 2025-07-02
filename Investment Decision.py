@@ -185,7 +185,7 @@ def analyze_with_ai(text):
     - Score out of 10
     - 1-sentence explanation (with numeric data)
 
-    Return as csv table. Show the final score out of 50. Conclude with investment recommendation.
+    Return as markdown table. Show the final score out of 50. Conclude with investment recommendation.
 
     Content:
     {final_input}
@@ -281,12 +281,20 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         else:
             st.info("No valid score data to export.")
 
-
     elif len(selected) == 1:
         idx = int(selected[0].split(".")[0]) - 1
         record = st.session_state["records"][idx]
         st.markdown(f"###  {record['filename']}")
         st.markdown(record["score"])
+        df = parse_score_table_to_df(record["score"])  
+        csv = df.to_csv(index=False).encode("utf-8")     
+        st.download_button(
+            label="📥 Download CSV",
+            data=csv,
+            file_name="scores.csv",
+            mime="text/csv"
+        )
+
 
 else:
     st.info("Please upload at least one company file.")
