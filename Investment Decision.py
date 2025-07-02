@@ -163,7 +163,7 @@ def analyze_with_ai(text):
     - Score out of 10
     - 1-sentence explanation (with numeric data)
 
-    Return as markdown table. Show the final score out of total score. Conclude with investment recommendation.
+    Return as markdown table. Show the final score out of 50. Conclude with investment recommendation.
 
     Content:
     {final_input}
@@ -215,18 +215,20 @@ if st.session_state.get("analysis_done", False):
             st.session_state["records"] = st.session_state["records"][-MAX_RECORDS:]
         st.success("Result saved!")
 
-if len(selected) >= 2:
-    indices = [int(s.split(".")[0]) - 1 for s in selected]
-    records = [st.session_state["records"][i] for i in indices]
+options = [f"{i+1}. {record['filename']}" for i, record in enumerate(st.session_state["records"])]
 
-    options = [f"{i+1}. {record['filename']}" for i, record in enumerate(st.session_state["records"])]
-
+if len(options) >= 2:
     selected = st.multiselect(
         "Select companies to compare (up to 10)", 
         options, 
         default=[options[0], options[1]],
         max_selections=10
     )
+
+if len(selected) >= 2:
+    indices = [int(s.split(".")[0]) - 1 for s in selected]
+    records = [st.session_state["records"][i] for i in indices]
+
     st.markdown("### Score Table Comparison")
     cols = st.columns(len(records))
     for i, col in enumerate(cols):
