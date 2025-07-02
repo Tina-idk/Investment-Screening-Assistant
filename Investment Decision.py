@@ -59,8 +59,10 @@ def parse_score_table_to_df(markdown_table_str):
 
 def extract_scores_only(markdown_table_str):
     df = parse_score_table_to_df(markdown_table_str)
-    return df.set_index("Criteria")["Score"]
-
+    if df.empty or "Score" not in df.columns or "Criteria" not in df.columns:
+        return {}
+    df["Score"] = df["Score"].astype(str).str.strip()
+    return df.set_index("Criteria")["Score"].to_dict()
 
 # AI Analysis
 import google.generativeai as genai
