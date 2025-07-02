@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 st.title("Investment Screening Assistant")
 st.write("Upload company documents and let AI help evaluate whether the business meets your investment criteria!")
-uploaded_file = st.file_uploader("Upload company profile, pitch deck, or business plan", type=["pdf", "pptx"])
+uploaded_file = st.file_uploader("Upload company profile, pitch deck, or business plan", type=["pdf"])
 
 # Text Extraction
 def extract_text(uploaded_file):
