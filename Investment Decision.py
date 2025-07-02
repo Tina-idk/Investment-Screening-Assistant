@@ -265,19 +265,22 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         full_tables = []
         for record in records:
             df_full = parse_score_table_to_df(record["score"])
-            df_full["Source File"] = record["filename"] 
-            full_tables.append(df_full)
+            if not df_full.empty:
+                df_full["Source File"] = record["filename"]  # 标明来源公司
+                full_tables.append(df_full)
         if full_tables:
             combined_df = pd.concat(full_tables, ignore_index=True)
-            st.markdown("### Full Score Table with Explanation")
             st.dataframe(combined_df, use_container_width=True)
             csv = combined_df.to_csv(index=False).encode("utf-8")
             st.download_button(
-                label="Download full table as CSV",
+                label="📥 Download full scores CSV",
                 data=csv,
                 file_name="full_scores_with_explanations.csv",
                 mime="text/csv"
             )
+        else:
+            st.info("No valid score data to export.")
+
 
     elif len(selected) == 1:
         idx = int(selected[0].split(".")[0]) - 1
