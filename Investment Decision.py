@@ -40,9 +40,18 @@ def generate_multi_comparison_conclusion(records):
     
 def parse_score_table_to_df(markdown_table_str):
     lines = markdown_table_str.strip().splitlines()
-    table_lines = [line for line in lines if line.strip().startswith("|") and "---" not in line]
+    table_started = False
+    table_lines = []
+    for line in lines:
+        if line.strip().startswith("|"):
+            table_started = True
+            table_lines.append(line)
+        elif table_started:
+            break  
+    table_lines = [line for line in table_lines if "---" not in line]
     if len(table_lines) < 2:
         return pd.DataFrame()
+    
     rows = []
     for line in table_lines[1:]:  
         parts = [part.strip() for part in line.strip().strip("|").split("|")]
@@ -271,7 +280,7 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         st.markdown("###  Score Breakdown per Company")
         for record in records:
             with st.expander(f"View detailed explanations for: {record['filename']}"):
-                score_df = parse_score_table_to_df(record["score"])  # reuse your existing function
+                score_df = parse_score_table_to_df(record["score"]) 
                 if not score_df.empty:
                     score_df = score_df[["Criteria", "Explanation"]].set_index("Criteria")
                     st.table(score_df)
