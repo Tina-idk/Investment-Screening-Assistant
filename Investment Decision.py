@@ -127,6 +127,10 @@ def analyze_with_ai(text):
     return intro_response, SEIS_response, EIS_response, score_response
 
 # Output
+# Only show "Save Result" if AI analysis has been run
+if "analysis_done" not in st.session_state:
+    st.session_state["analysis_done"] = False
+
 if uploaded_file:
     content = extract_text(uploaded_file)
     if content:
@@ -134,6 +138,9 @@ if uploaded_file:
         if st.button("Analyze with AI"):
             with st.spinner("Analyzing..."):
                 intro_response, SEIS_response, EIS_response, score_response = analyze_with_ai(content)
+                st.session_state["intro_response"] = intro_response
+                st.session_state["score_response"] = score_response
+                st.session_state["analysis_done"] = True  # ✅ Mark as done
             st.subheader("Company Overview")
             st.write(intro_response)
             st.subheader("SEIS Judgement")
@@ -145,19 +152,46 @@ if uploaded_file:
     else:
         st.error("Unsupported file type or empty content.")
 
-if "records" not in st.session_state:
-    st.session_state["records"] = []
-if st.button("Save Result"):
-    st.session_state["records"].append({
-        "filename": uploaded_file.name,
-        "overview": intro_response,
-        "score": score_response,
-    })
-    st.success("Result saved!")
-st.subheader("Saved Analyses")
-for idx, record in enumerate(st.session_state["records"]):
-    with st.expander(f"{idx+1}. {record['filename']}"):
-        st.markdown("**Company Overview:**")
-        st.write(record["overview"])
-        st.markdown("**Score Table:**")
-        st.markdown(record["score"])
+# Only allow saving if analysis is completed
+if st.session_state.get("analysis_done", False):
+    if st.button("Save Result"):
+        st.session_state["records"].append({
+            "filename": uploaded_file.name,
+            "overview": st.session_state["intro_response"],
+            "score": st.session_state["score_response"],
+        })
+        st.success("Result saved!")
+
+if len(st.session_state["records"]) >= 2:
+    st.subheader("Compare Two Analyses")
+    options = [f"{i+1}. {r['filename']}" for i, r in enumerate(st.session_state["records"])]
+
+    col1, col2 = st.columns(2)
+    with col1:
+        choice1 = st.selectbox("Select first record", options, key="compare_1")
+    with col2:
+        choice2 = st.selectbox("Select second record", options, index=1, key="compare_2")
+
+    idx1 = int(choice1.split(".")[0]) - 1
+    idx2 = int(choice2.split(".")[0]) - 1
+    rec1 = st.session_state["records"][idx1]
+    rec2 = st.session_state["records"][idx2]
+
+    st.markdown("### 🧠 Company Overview Comparison")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown(f"**{rec1['filename']}**")
+        st.write(rec1["overview"])
+    with col2:
+        st.markdown(f"**{rec2['filename']}**")
+        st.write(rec2["overview"])
+
+    st.markdown("### 📊 Score Table Comparison")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown(f"**{rec1['filename']}**")
+        st.markdown(rec1["score"])
+    with col2:
+        st.markdown(f"**{rec2['filename']}**")
+        st.markdown(rec2["score"])
+
