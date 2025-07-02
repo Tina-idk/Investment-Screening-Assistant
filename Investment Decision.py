@@ -166,7 +166,7 @@ if st.session_state.get("analysis_done", False):
             "score": st.session_state["score_response"],
         })
         if len(st.session_state["records"]) > MAX_RECORDS:
-        st.session_state["records"] = st.session_state["records"][-MAX_RECORDS:]
+            st.session_state["records"] = st.session_state["records"][-MAX_RECORDS:]
         st.success("Result saved!")
 
 if len(st.session_state["records"]) >= 2:
