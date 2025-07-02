@@ -43,6 +43,20 @@ def generate_multi_comparison_conclusion(records):
     """
     response = model.generate_content(prompt, generation_config={"temperature": 0})
     return response.text
+    
+def parse_score_table_to_df(markdown_table_str):
+    import pandas as pd
+    from io import StringIO
+
+    lines = markdown_table_str.strip().splitlines()
+    table_lines = [line for line in lines if line.strip().startswith("|") and "---" not in line]
+    if len(table_lines) < 2:
+        return pd.DataFrame()
+
+    csv_str = "\n".join([line.strip().strip("|").replace(" | ", ",") for line in table_lines])
+    df = pd.read_csv(StringIO(csv_str), names=["Criteria", "Score", "Explanation"])
+    return df
+
 
 # AI Analysis
 import google.generativeai as genai
@@ -229,13 +243,40 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
     if len(selected) >= 2:
         indices = [int(s.split(".")[0]) - 1 for s in selected]
         records = [st.session_state["records"][i] for i in indices]
+        score_dict = {}
+        for record in records:
+            score_dict[record["filename"]] = parse_score_table(record["score"])
+        df = pd.DataFrame(score_dict)
+        df.index.name = "Criteria"
+        st.markdown("### Score Table Comparison")
+        st.dataframe(df, use_container_width=True)
+        summary = generate_multi_comparison_conclusion(records)
+        st.subheader("AI Summary Conclusion")
+        st.write(summary)
 
-        st.markdown("###Score Table Comparison")
-        cols = st.columns(len(records))
-        for i, col in enumerate(cols):
-            with col:
-                st.markdown(f"**{records[i]['filename']}**")
-                st.markdown(records[i]["score"])
+        records = [st.session_state["records"][i] for i in indices]     
+        full_tables = []
+        for record in records:
+            df_full = parse_score_table_to_df(record["score"])
+            df_full["Source File"] = record["filename"]  # 添加一列来源
+            full_tables.append(df_full)
+        if full_tables:
+            combined_df = pd.concat(full_tables, ignore_index=True)
+            st.markdown("### 🧾 Full Score Table with Explanation")
+            st.dataframe(combined_df, use_container_width=True)
+            csv = combined_df.to_csv(index=False).encode("utf-8")
+            st.download_button(
+                label="📥 Download full table as CSV",
+                data=csv,
+                file_name="full_scores_with_explanations.csv",
+                mime="text/csv"
+            )
+
+    elif len(selected) == 1:
+        idx = int(selected[0].split(".")[0]) - 1
+        record = st.session_state["records"][idx]
+        st.markdown(f"###  {record['filename']}")
+        st.markdown(record["score"])
 
 else:
     st.info("Please upload at least one company file.")
