@@ -245,7 +245,7 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         records = [st.session_state["records"][i] for i in indices]
         score_dict = {}
         for record in records:
-            score_dict[record["filename"]] = parse_score_table(record["score"])
+            score_dict[record["filename"]] = parse_score_table(record["score"]) 
         df = pd.DataFrame(score_dict)
         df.index.name = "Criteria"
         st.markdown("### Score Table Comparison")
@@ -253,12 +253,11 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         summary = generate_multi_comparison_conclusion(records)
         st.subheader("AI Summary Conclusion")
         st.write(summary)
-
-        records = [st.session_state["records"][i] for i in indices]     
+   
         full_tables = []
         for record in records:
             df_full = parse_score_table_to_df(record["score"])
-            df_full["Source File"] = record["filename"]  # 添加一列来源
+            df_full["Source File"] = record["filename"] 
             full_tables.append(df_full)
         if full_tables:
             combined_df = pd.concat(full_tables, ignore_index=True)
