@@ -141,17 +141,12 @@ def analyze_with_ai(text):
                 50–100% → Score 5～6
                 100–200% → Score 7～8
                 >200% → Score 9～10
-    1. Product  
-    2. Team  
-    3. Financial Assessment 
-    4. Market Attractiveness  
-    5. Exit Potential
 
     For each:
     - Score out of 10
     - 1-sentence explanation (with numeric data)
 
-    Return as markdown table. Show the final score out of 70. Conclude with investment recommendation.
+    Return as markdown table. Show the final score out of 20. Conclude with investment recommendation.
 
     Content:
     {final_input}
