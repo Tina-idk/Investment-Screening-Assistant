@@ -198,3 +198,19 @@ if len(st.session_state["records"]) >= 2:
         st.markdown(f"**{rec2['filename']}**")
         st.markdown(rec2["score"])
 
+if st.button("Clear All Saved Analyses"):
+    st.session_state["records"] = []
+    st.success("All records have been cleared!")
+
+MAX_RECORDS = 10
+
+if st.button("Save Result"):
+    st.session_state["records"].append({
+        "filename": uploaded_file.name,
+        "overview": st.session_state["intro_response"],
+        "score": st.session_state["score_response"],
+    })
+    if len(st.session_state["records"]) > MAX_RECORDS:
+        st.session_state["records"] = st.session_state["records"][-MAX_RECORDS:]
+    st.success("Result saved!")
+
