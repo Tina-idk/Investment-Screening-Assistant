@@ -231,9 +231,9 @@ if len(st.session_state["records"]) >= 2:
             st.session_state["records"][idx2]["score"],
             choice1,
             choice2
-        )
-        st.subheader("AI Summary Conclusion")
-        st.write(conclusion)
+            )
+            st.subheader("AI Summary Conclusion")
+            st.write(conclusion)
 
 if st.button("Clear All Saved Analyses"):
     st.session_state["records"] = []
