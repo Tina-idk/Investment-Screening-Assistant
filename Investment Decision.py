@@ -185,12 +185,15 @@ def analyze_with_ai(text):
         Founders does not retain at least 40% ownership pre-Series A (including option pool) → Score 0
         Founders retain at least 40% ownership pre-Series A (including option pool) → Score 4~5
         Exception: The Options pool of X is being created to bolster founder shareholder → Score 4~5
+
+    Total score:
+        Calculate the final score out of 30
         
     For each:
     - Score out of 5
     - 1-sentence explanation (with numeric data)
 
-    Return as markdown table. Show the final score out of 30 as a conclusion but not in the table. Conclude with investment recommendation. 
+    Return as markdown table. Conclude with investment recommendation. 
 
     Content:
     {final_input}
