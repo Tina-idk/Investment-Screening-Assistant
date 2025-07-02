@@ -190,7 +190,7 @@ def analyze_with_ai(text):
     - Score out of 5
     - 1-sentence explanation (with numeric data)
 
-    Return as markdown table. Show the final score out of 30. Conclude with investment recommendation.
+    Return as markdown table. Show the final score out of 30. Conclude with investment recommendation. 
 
     Content:
     {final_input}
