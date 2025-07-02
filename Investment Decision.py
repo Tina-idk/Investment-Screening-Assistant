@@ -23,9 +23,6 @@ def extract_text(uploaded_file):
         return "Unsupported file type."
         
 def generate_multi_comparison_conclusion(records):
-    model = genai.GenerativeModel(model_name="gemini-1.5-flash")
-
-    # 生成多家公司评分内容
     companies_text = ""
     for i, record in enumerate(records, 1):
         companies_text += f"\nCompany {i} ({record['filename']}):\n{record['score']}\n"
