@@ -142,41 +142,55 @@ def analyze_with_ai(text):
 
     score_prompt = f"""
     Evaluate the company based on these criteria and corresponding standards of evaluation after the colon:
-    Annual Revenue: £0 – £50K -> score 1～2 (Pre-revenue, idea-stage, may be SEIS)
-                    £50K – £200K -> score 3～4 (MVP with some customers)
-                    £200K – £500K -> score 5～6 (Early monetization, but still proving model)
-                    £500K – £1M -> score 7～8 (Growing revenue, signs of traction)
-                    £1M+ -> score 9～10 (Commercial validation, possible scaling)
-    YoY Growth: Calculate the YoY Growth rate based on: (Year2 - Year1) / Year1 (use latest data)
-                <0% → Score 1～2
-                0–50% → Score 3～4
-                50–100% → Score 5～6
-                100–200% → Score 7～8
-                >200% → Score 9～10
-    Founder & Team Assessment: 
-        No relevant experience or unverifiable team → Score 1～2
-        Solo founder or minimal relevant background → Score 3～4
-        Small team with some relevant background → Score 5～6
-        Strong, diverse team with good experience → Score 7～8
-        Proven, highly credible founding team with strong track record → Score 9～10
-    Products/Services:
-        No product yet / purely conceptual → Score 1～2
-        MVP exists but little to no validation → Score 3～4
-        Functional with early users/pilots → Score 5～6
-        PMF indicators, clear adoption → Score 7～8
-        Proven product with strong differentiation and growth → Score 9～10
-    Exit Potential:
-        No exit plan, no precedent → Score 1～2
-        Vague or unrealistic exit ideas → Score 3～4
-        Some exit potential, unclear path → Score 5～6
-        Clear scenarios, comparables or likely buyers exist → Score 7～8
-        Strong exit potential with multiple paths and founder experience → Score 9～10
+    Remember if you think there exist vital drawbacks, please deduct scores and give the reasons in the explanation
+    
+    Annual Revenue: 
+        Revenue below £1M Portion of revenue is SaaS / Recurring revenue less than 50% → Score 0
+        Revenue below £1M or Portion of revenue is SaaS / Recurring revenue less than 50% → Score 1~2
+        Revenue below £1M but a clear path to £1m within 6 months and Portion of revenue is SaaS / Recurring revenue (50%) → Score 3~4
+        £1M+ revenue and Portion of revenue is SaaS / Recurring revenue (50%) → Score 4~5
+                    
+    Growth: 
+        Early-stage companies(whose revenue is sub £3m):
+            Not show MoM growth → Score 0
+            Show MoM growth → Score 1~3
+            Show strong MoM growth or 50% YoY growth → Score 4~5
+        
+        Later-stage companies(whose revenue is above £3m)
+            Not demonstrate solid YoY growth → Score 0
+            Demonstrate solid YoY growth:
+                Agency models → Score 0
+                Business model benchmarks: (If the score reaches benchmark → Score 4-5, or → Score 1~3)
+                    SaaS: 100% YoY growth
+                    Marketplaces: 60–100% YoY growth
+                    Transactional: ~20% YoY growth
+            Exception: operate in a market with smaller growth (FMCG) – Company is doing 50% on top of the market average → Score 4~5
+            
+    Founders: 
+        Founders do not have deep domain expertise and a strong marketing-led strategy → Score 0
+        Founders have deep domain expertise or a strong marketing-led strategy → Score 1~3
+        Founders have deep domain expertise and a strong marketing-led strategy → Score 4~5
+        
+    Market & Products:
+        Market is not growing or shrinking; product lacks innovation; market size is insufficient to support target exit revenue and 3x return → Score 0
+        Market shows some growth; product has some innovation; total addressable market (TAM) is reasonably large but expected market share is low (<1%); 3x return logic is unclear or weak → Score 1~3
+        Clearly growing market; product is innovative and competitive; large market size (supporting £20m+ revenue); expected to capture 1–3% market share in 3–5 years; clear and reasonable data supporting 3x return → 4~5
+        
+    Valuation Discipline:
+        Valuation is not based on actual trailing 12-month revenue multiples or lacks justification → Score 0
+        Valuation mostly based on trailing 12-month revenues, but justification in due diligence (DD) report is weak or incomplete → Score 1~3
+        Valuation firmly grounded in multiples of actual trailing 12-month revenues; justifications are clear, well-documented, and withstand rigorous scrutiny in DD → Score 4~5
+        
+    Cap Table:
+        Founders does not retain at least 40% ownership pre-Series A (including option pool) → Score 0
+        Founders retain at least 40% ownership pre-Series A (including option pool) → Score 4~5
+        Exception: The Options pool of X is being created to bolster founder shareholder → Score 4~5
         
     For each:
-    - Score out of 10
+    - Score out of 5
     - 1-sentence explanation (with numeric data)
 
-    Return as markdown table. Show the final score out of 50. Conclude with investment recommendation.
+    Return as markdown table. Show the final score out of 30. Conclude with investment recommendation.
 
     Content:
     {final_input}
