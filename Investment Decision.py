@@ -129,7 +129,18 @@ def analyze_with_ai(text):
     EIS_response = model.generate_content(EIS_promt, generation_config={"temperature": 0}).text
 
     score_prompt = f"""
-    Evaluate the company based on these criteria:
+    Evaluate the company based on these criteria and corresponding standards of evaluation after the colon:
+    Annual Revenue: £0 – £50K -> score 1～2 (Pre-revenue, idea-stage, may be SEIS)
+                    £50K – £200K -> score 3～4 (MVP with some customers)
+                    £200K – £500K -> score 5～6 (Early monetization, but still proving model)
+                    £500K – £1M -> score 7～8 (Growing revenue, signs of traction)
+                    £1M+ -> score 9～10 (Commercial validation, possible scaling)
+    YoY Growth: Calculate the YoY Growth rate based on: (Year2 - Year1) / Year1 (use latest data)
+                <0% → Score 1～2
+                0–50% → Score 3～4
+                50–100% → Score 5～6
+                100–200% → Score 7～8
+                >200% → Score 9～10
     1. Product  
     2. Team  
     3. Financial Assessment 
@@ -138,7 +149,7 @@ def analyze_with_ai(text):
 
     For each:
     - Score out of 10
-    - 1-sentence explanation
+    - 1-sentence explanation (with numeric data)
 
     Return as markdown table. Show the final score out of 50. Conclude with investment recommendation.
 
