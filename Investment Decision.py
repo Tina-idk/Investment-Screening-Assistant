@@ -252,6 +252,7 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         score_dict = {}
         for record in records:
             score_dict[record["filename"]] = extract_scores_only(record["score"]) 
+        st.write(score_dict)
         df = pd.DataFrame(score_dict)
         df.index.name = "Criteria"
         st.markdown("### Score Table Comparison")
@@ -267,11 +268,11 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
             full_tables.append(df_full)
         if full_tables:
             combined_df = pd.concat(full_tables, ignore_index=True)
-            st.markdown("### 🧾 Full Score Table with Explanation")
+            st.markdown("### Full Score Table with Explanation")
             st.dataframe(combined_df, use_container_width=True)
             csv = combined_df.to_csv(index=False).encode("utf-8")
             st.download_button(
-                label="📥 Download full table as CSV",
+                label="Download full table as CSV",
                 data=csv,
                 file_name="full_scores_with_explanations.csv",
                 mime="text/csv"
