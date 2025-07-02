@@ -141,12 +141,30 @@ def analyze_with_ai(text):
                 50–100% → Score 5～6
                 100–200% → Score 7～8
                 >200% → Score 9～10
-
+    Founder & Team Assessment: 
+        No relevant experience or unverifiable team → Score 1～2
+        Solo founder or minimal relevant background → Score 3～4
+        Small team with some relevant background → Score 5～6
+        Strong, diverse team with good experience → Score 7～8
+        Proven, highly credible founding team with strong track record → Score 9～10
+    Products/Services:
+        No product yet / purely conceptual → Score 1～2
+        MVP exists but little to no validation → Score 3～4
+        Functional with early users/pilots → Score 5～6
+        PMF indicators, clear adoption → Score 7～8
+        Proven product with strong differentiation and growth → Score 9～10
+    Exit Potential:
+        No exit plan, no precedent → Score 1～2
+        Vague or unrealistic exit ideas → Score 3～4
+        Some exit potential, unclear path → Score 5～6
+        Clear scenarios, comparables or likely buyers exist → Score 7～8
+        Strong exit potential with multiple paths and founder experience → Score 9～10
+        
     For each:
     - Score out of 10
     - 1-sentence explanation (with numeric data)
 
-    Return as markdown table. Show the final score out of 20. Conclude with investment recommendation.
+    Return as markdown table. Show the final score out of total score. Conclude with investment recommendation.
 
     Content:
     {final_input}
