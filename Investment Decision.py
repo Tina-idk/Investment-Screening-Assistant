@@ -12,15 +12,6 @@ def extract_text(uploaded_file):
         import fitz
         doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
         return "\n".join([page.get_text() for page in doc])
-    elif file_type == "pptx":
-        from pptx import Presentation
-        prs = Presentation(uploaded_file)
-        text = ""
-        for slide in prs.slides:
-            for shape in slide.shapes:
-                if hasattr(shape, "text"):
-                    text += shape.text + "\n"
-        return text
     else:
         return "Unsupported file type."
         
