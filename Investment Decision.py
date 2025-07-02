@@ -38,7 +38,7 @@ def analyze_with_ai(text):
 
         {chunk}
         """
-        response = model.generate_content(prompt)
+        response = model.generate_content(prompt, generation_config={"temperature": 0})
         summaries.append(response.text)
     final_input = "\n\n".join(summaries)
 
@@ -57,7 +57,7 @@ def analyze_with_ai(text):
     Content:
     {final_input}
     """
-    intro_response = model.generate_content(intro_prompt).text
+    intro_response = model.generate_content(intro_prompt, generation_config={"temperature": 0}).text
     
     SEIS_promt = f"""
     Please assess whether the following company meets the eligibility criteria for the UK Enterprise Investment Scheme (EIS).
@@ -79,7 +79,7 @@ def analyze_with_ai(text):
     Content:
     {final_input}
     """
-    SEIS_response = model.generate_content(SEIS_promt).text
+    SEIS_response = model.generate_content(SEIS_promt, generation_config={"temperature": 0}).text
 
     EIS_promt = f"""
     Please assess whether the following company meets the eligibility criteria for the UK Enterprise Investment Scheme (EIS).
@@ -103,7 +103,7 @@ def analyze_with_ai(text):
     Content:
     {final_input}
     """
-    EIS_response = model.generate_content(EIS_promt).text
+    EIS_response = model.generate_content(EIS_promt, generation_config={"temperature": 0}).text
 
     score_prompt = f"""
     Evaluate the company based on these criteria:
@@ -122,7 +122,7 @@ def analyze_with_ai(text):
     Content:
     {final_input}
     """
-    score_response = model.generate_content(score_prompt).text
+    score_response = model.generate_content(score_prompt, generation_config={"temperature": 0}).text
 
     return intro_response, SEIS_response, EIS_response, score_response
 
