@@ -162,6 +162,9 @@ if st.session_state.get("analysis_done", False):
         })
         st.success("Result saved!")
 
+if "records" not in st.session_state:
+    st.session_state["records"] = []
+
 if len(st.session_state["records"]) >= 2:
     st.subheader("Compare Two Analyses")
     options = [f"{i+1}. {r['filename']}" for i, r in enumerate(st.session_state["records"])]
@@ -177,7 +180,7 @@ if len(st.session_state["records"]) >= 2:
     rec1 = st.session_state["records"][idx1]
     rec2 = st.session_state["records"][idx2]
 
-    st.markdown("### 🧠 Company Overview Comparison")
+    st.markdown("###Company Overview Comparison")
     col1, col2 = st.columns(2)
     with col1:
         st.markdown(f"**{rec1['filename']}**")
@@ -186,7 +189,7 @@ if len(st.session_state["records"]) >= 2:
         st.markdown(f"**{rec2['filename']}**")
         st.write(rec2["overview"])
 
-    st.markdown("### 📊 Score Table Comparison")
+    st.markdown("###Score Table Comparison")
     col1, col2 = st.columns(2)
     with col1:
         st.markdown(f"**{rec1['filename']}**")
