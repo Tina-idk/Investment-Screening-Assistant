@@ -265,16 +265,27 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
     if len(selected) >= 2:
         indices = [int(s.split(".")[0]) - 1 for s in selected]
         records = [st.session_state["records"][i] for i in indices]
+    
         score_dict = {}
         for record in records:
-            score_dict[record["filename"]] = extract_scores_only(record["score"]) 
+            score_dict[record["filename"]] = extract_scores_only(record["score"])
+
+        criteria_order = [
+            "Annual Revenue", "Growth", "Founders", "Market & Products",
+            "Valuation Discipline", "Cap Table", "Total Score"
+        ]
+    
         df = pd.DataFrame(score_dict)
-        df.index.name = "Criteria"
-        numeric_df = df.apply(pd.to_numeric, errors="coerce") 
-        df.loc["Total Score"] = numeric_df.sum()
+    
+        df = df.reindex(criteria_order)
+    
+        numeric_df = df.apply(pd.to_numeric, errors="coerce")
+    
+        numeric_df.loc["Total Score"] = numeric_df.drop("Total Score", errors='ignore').sum()
+    
         st.markdown("### Score Table Comparison")
-        st.dataframe(df, use_container_width=True)
-        
+        st.dataframe(numeric_df, use_container_width=True)
+    
         combo_key = frozenset([record["filename"] for record in records])
         if "multi_conclusions" not in st.session_state:
             st.session_state["multi_conclusions"] = {}
@@ -283,13 +294,14 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         else:
             summary = generate_multi_comparison_conclusion(records)
             st.session_state["multi_conclusions"][combo_key] = summary
-            
+    
         st.subheader("AI Summary Conclusion")
         st.write(summary)
-        st.markdown("###  Score Breakdown per Company")
+    
+        st.markdown("### Score Breakdown per Company")
         for record in records:
             with st.expander(f"View detailed explanations for: {record['filename']}"):
-                score_df = parse_score_table_to_df(record["score"]) 
+                score_df = parse_score_table_to_df(record["score"])
                 if not score_df.empty:
                     score_df = score_df[["Criteria", "Explanation"]].set_index("Criteria")
                     st.table(score_df)
