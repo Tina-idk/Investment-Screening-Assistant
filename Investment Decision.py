@@ -1,3 +1,5 @@
+import pandas as pd
+
 import streamlit as st
 st.title("Investment Screening Assistant")
 st.write("Upload company documents and let AI help evaluate whether the business meets your investment criteria!")
@@ -45,7 +47,6 @@ def generate_multi_comparison_conclusion(records):
     return response.text
     
 def parse_score_table_to_df(markdown_table_str):
-    import pandas as pd
     lines = markdown_table_str.strip().splitlines()
     table_lines = [line for line in lines if line.strip().startswith("|") and "---" not in line]
     if len(table_lines) < 2:
@@ -252,7 +253,6 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         score_dict = {}
         for record in records:
             score_dict[record["filename"]] = extract_scores_only(record["score"]) 
-        st.write(score_dict)
         df = pd.DataFrame(score_dict)
         df.index.name = "Criteria"
         st.markdown("### Score Table Comparison")
