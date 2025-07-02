@@ -274,7 +274,16 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         df.loc["Total Score"] = numeric_df.sum()
         st.markdown("### Score Table Comparison")
         st.dataframe(df, use_container_width=True)
-        summary = generate_multi_comparison_conclusion(records)
+        
+        combo_key = frozenset([record["filename"] for record in records])
+        if "multi_conclusions" not in st.session_state:
+            st.session_state["multi_conclusions"] = {}
+        if combo_key in st.session_state["multi_conclusions"]:
+            summary = st.session_state["multi_conclusions"][combo_key]
+        else:
+            summary = generate_multi_comparison_conclusion(records)
+            st.session_state["multi_conclusions"][combo_key] = summary
+            
         st.subheader("AI Summary Conclusion")
         st.write(summary)
         st.markdown("###  Score Breakdown per Company")
