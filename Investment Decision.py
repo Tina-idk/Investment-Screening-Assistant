@@ -215,19 +215,18 @@ if st.session_state.get("analysis_done", False):
             st.session_state["records"] = st.session_state["records"][-MAX_RECORDS:]
         st.success("Result saved!")
 
-options = [f"{i+1}. {record['filename']}" for i, record in enumerate(st.session_state["records"])]
-
-selected = st.multiselect(
-    "Select companies to compare (up to 10)", 
-    options, 
-    default=[options[0], options[1]],
-    max_selections=10
-)
-
 if len(selected) >= 2:
     indices = [int(s.split(".")[0]) - 1 for s in selected]
     records = [st.session_state["records"][i] for i in indices]
 
+    options = [f"{i+1}. {record['filename']}" for i, record in enumerate(st.session_state["records"])]
+
+    selected = st.multiselect(
+        "Select companies to compare (up to 10)", 
+        options, 
+        default=[options[0], options[1]],
+        max_selections=10
+    )
     st.markdown("### Score Table Comparison")
     cols = st.columns(len(records))
     for i, col in enumerate(cols):
