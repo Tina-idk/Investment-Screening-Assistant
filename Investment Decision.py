@@ -22,25 +22,27 @@ def extract_text(uploaded_file):
     else:
         return "Unsupported file type."
         
-def generate_comparison_conclusion(score1_md, score2_md, name1, name2):
+def generate_multi_comparison_conclusion(records):
     model = genai.GenerativeModel(model_name="gemini-1.5-flash")
-    
+
+    # 生成多家公司评分内容
+    companies_text = ""
+    for i, record in enumerate(records, 1):
+        companies_text += f"\nCompany {i} ({record['filename']}):\n{record['score']}\n"
+
     prompt = f"""
-    Compare the following two companies based on their investment scores.
+    Compare the following companies based on their investment scores.
     Each has been evaluated based on: Product, Team, Financial Assessment, Market Attractiveness, Exit Potential.
 
-    Company 1 ({name1}):
-    {score1_md}
+    {companies_text}
 
-    Company 2 ({name2}):
-    {score2_md}
-
-    Write a short conclusion (3–5 sentences) explaining:
-    - Which company performs better overall
+    Write a comparison summary (5–8 sentences) explaining:
+    - Which companies perform better overall and why
     - Their respective strengths and weaknesses
-    - Which one is more suitable for investment (if clear)
+    - If any company stands out as the best investment target
+    - Any ties or close comparisons worth mentioning
 
-    Be concise and objective.
+    Be concise, neutral, and insightful.
     """
     response = model.generate_content(prompt, generation_config={"temperature": 0})
     return response.text
@@ -216,48 +218,31 @@ if st.session_state.get("analysis_done", False):
             st.session_state["records"] = st.session_state["records"][-MAX_RECORDS:]
         st.success("Result saved!")
 
-if len(st.session_state["records"]) >= 2:
-    st.subheader("Compare Two Analyses")
-    options = [f"{i+1}. {r['filename']}" for i, r in enumerate(st.session_state["records"])]
+selected = st.multiselect(
+    "Select companies to compare (up to 10)", 
+    options, 
+    default=[options[0], options[1]],
+    max_selections=10
+)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        choice1 = st.selectbox("Select first record", options, key="compare_1")
-    with col2:
-        choice2 = st.selectbox("Select second record", options, index=1, key="compare_2")
+if len(selected) >= 2:
+    indices = [int(s.split(".")[0]) - 1 for s in selected]
+    records = [st.session_state["records"][i] for i in indices]
 
-    idx1 = int(choice1.split(".")[0]) - 1
-    idx2 = int(choice2.split(".")[0]) - 1
-    rec1 = st.session_state["records"][idx1]
-    rec2 = st.session_state["records"][idx2]
-
-    st.markdown("###Company Overview Comparison")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown(f"**{rec1['filename']}**")
-        st.write(rec1["overview"])
-    with col2:
-        st.markdown(f"**{rec2['filename']}**")
-        st.write(rec2["overview"])
-
-    st.markdown("###Score Table Comparison")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown(f"**{rec1['filename']}**")
-        st.markdown(rec1["score"])
-    with col2:
-        st.markdown(f"**{rec2['filename']}**")
-        st.markdown(rec2["score"])
-    if idx1 != idx2:
-        if st.button("Generate Comparison Summary"):
-            conclusion = generate_comparison_conclusion(
-            st.session_state["records"][idx1]["score"],
-            st.session_state["records"][idx2]["score"],
-            choice1,
-            choice2
-            )
-            st.subheader("AI Summary Conclusion")
-            st.write(conclusion)
+    st.markdown("### Score Table Comparison")
+    cols = st.columns(len(records))
+    for i, col in enumerate(cols):
+        with col:
+            st.markdown(f"**{records[i]['filename']}**")
+            st.markdown(records[i]["score"])
+    conclusion = generate_comparison_conclusion(
+    st.session_state["records"][idx1]["score"],
+    st.session_state["records"][idx2]["score"],
+    choice1,
+    choice2
+    )
+    st.subheader("AI Summary Conclusion")
+    st.write(conclusion)
 
 if st.button("Clear All Saved Analyses"):
     st.session_state["records"] = []
