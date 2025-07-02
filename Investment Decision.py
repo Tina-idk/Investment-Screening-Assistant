@@ -53,7 +53,7 @@ def parse_score_table_to_df(markdown_table_str):
     if len(table_lines) < 2:
         return pd.DataFrame()
 
-    csv_str = "\n".join([line.strip().strip("|").replace(" | ", ",") for line in table_lines])
+    csv_str = "\n".join([line.strip().strip("|").replace(" | ", ",") for line in table_lines[1:]])
     df = pd.read_csv(StringIO(csv_str), names=["Criteria", "Score", "Explanation"])
     return df
 
@@ -245,7 +245,7 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         records = [st.session_state["records"][i] for i in indices]
         score_dict = {}
         for record in records:
-            score_dict[record["filename"]] = parse_score_table(record["score"]) 
+            score_dict[record["filename"]] = parse_score_table_to_df(record["score"]) 
         df = pd.DataFrame(score_dict)
         df.index.name = "Criteria"
         st.markdown("### Score Table Comparison")
