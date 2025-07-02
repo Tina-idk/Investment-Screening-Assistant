@@ -202,6 +202,16 @@ if len(st.session_state["records"]) >= 2:
         st.markdown(f"**{rec2['filename']}**")
         st.markdown(rec2["score"])
 
+if st.button("Generate Comparison Summary"):
+    conclusion = generate_comparison_conclusion(
+        st.session_state["records"][idx1]["score"],
+        st.session_state["records"][idx2]["score"],
+        choice1,
+        choice2
+    )
+    st.subheader("AI Summary Conclusion")
+    st.write(conclusion)
+
 if st.button("Clear All Saved Analyses"):
     st.session_state["records"] = []
     st.success("All records have been cleared!")
