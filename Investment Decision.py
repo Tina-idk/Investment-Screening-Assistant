@@ -286,16 +286,7 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         record = st.session_state["records"][idx]
         st.markdown(f"###  {record['filename']}")
         st.markdown(record["score"])
-        df = parse_score_table_to_df(record["score"])  
-        csv = df.to_csv(index=False).encode("utf-8")     
-        st.download_button(
-            label="📥 Download CSV",
-            data=csv,
-            file_name="scores.csv",
-            mime="text/csv"
-        )
-
-
+        
 else:
     st.info("Please upload at least one company file.")
 
