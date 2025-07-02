@@ -155,6 +155,8 @@ if uploaded_file:
     else:
         st.error("Unsupported file type or empty content.")
 
+MAX_RECORDS = 10
+
 # Only allow saving if analysis is completed
 if st.session_state.get("analysis_done", False):
     if st.button("Save Result"):
@@ -163,6 +165,8 @@ if st.session_state.get("analysis_done", False):
             "overview": st.session_state["intro_response"],
             "score": st.session_state["score_response"],
         })
+        if len(st.session_state["records"]) > MAX_RECORDS:
+        st.session_state["records"] = st.session_state["records"][-MAX_RECORDS:]
         st.success("Result saved!")
 
 if len(st.session_state["records"]) >= 2:
@@ -201,16 +205,3 @@ if len(st.session_state["records"]) >= 2:
 if st.button("Clear All Saved Analyses"):
     st.session_state["records"] = []
     st.success("All records have been cleared!")
-
-MAX_RECORDS = 10
-
-if st.button("Save Result"):
-    st.session_state["records"].append({
-        "filename": uploaded_file.name,
-        "overview": st.session_state["intro_response"],
-        "score": st.session_state["score_response"],
-    })
-    if len(st.session_state["records"]) > MAX_RECORDS:
-        st.session_state["records"] = st.session_state["records"][-MAX_RECORDS:]
-    st.success("Result saved!")
-
