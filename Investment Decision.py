@@ -261,11 +261,23 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
             score_dict[record["filename"]] = extract_scores_only(record["score"]) 
         df = pd.DataFrame(score_dict)
         df.index.name = "Criteria"
+        numeric_df = df.apply(pd.to_numeric, errors="coerce") 
+        df.loc["Total Score"] = numeric_df.sum()
         st.markdown("### Score Table Comparison")
         st.dataframe(df, use_container_width=True)
         summary = generate_multi_comparison_conclusion(records)
         st.subheader("AI Summary Conclusion")
         st.write(summary)
+        st.markdown("###  Score Breakdown per Company")
+        for record in records:
+            with st.expander(f"View detailed explanations for: {record['filename']}"):
+                score_df = parse_score_table_to_df(record["score"])  # reuse your existing function
+                if not score_df.empty:
+                    score_df = score_df[["Criteria", "Explanation"]].set_index("Criteria")
+                    st.table(score_df)
+                else:
+                    st.info("No explanation found.")
+
     elif len(selected) == 1:
         idx = int(selected[0].split(".")[0]) - 1
         record = st.session_state["records"][idx]
