@@ -215,6 +215,8 @@ if st.session_state.get("analysis_done", False):
             st.session_state["records"] = st.session_state["records"][-MAX_RECORDS:]
         st.success("Result saved!")
 
+options = [f"{i+1}. {record['filename']}" for i, record in enumerate(st.session_state["records"])]
+
 selected = st.multiselect(
     "Select companies to compare (up to 10)", 
     options, 
