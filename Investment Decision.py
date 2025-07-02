@@ -131,6 +131,9 @@ def analyze_with_ai(text):
 if "analysis_done" not in st.session_state:
     st.session_state["analysis_done"] = False
 
+if "records" not in st.session_state:
+    st.session_state["records"] = []
+    
 if uploaded_file:
     content = extract_text(uploaded_file)
     if content:
@@ -161,9 +164,6 @@ if st.session_state.get("analysis_done", False):
             "score": st.session_state["score_response"],
         })
         st.success("Result saved!")
-
-if "records" not in st.session_state:
-    st.session_state["records"] = []
 
 if len(st.session_state["records"]) >= 2:
     st.subheader("Compare Two Analyses")
