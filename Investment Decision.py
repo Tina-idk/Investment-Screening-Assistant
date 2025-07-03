@@ -290,11 +290,11 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         records = [st.session_state["records"][i] for i in indices]
     
         for record in records:
-        base_name = record["filename"].replace(" ", "_").replace(".", "_")
-        record["overview"] = load_markdown_from_file(f"{base_name}_overview.md")
-        record["SEIS"] = load_markdown_from_file(f"{base_name}_SEIS.md")
-        record["EIS"] = load_markdown_from_file(f"{base_name}_EIS.md")
-        record["score"] = load_markdown_from_file(f"{base_name}_score.md")
+            base_name = record["filename"].replace(" ", "_").replace(".", "_")
+            record["overview"] = load_markdown_from_file(f"{base_name}_overview.md")
+            record["SEIS"] = load_markdown_from_file(f"{base_name}_SEIS.md")
+            record["EIS"] = load_markdown_from_file(f"{base_name}_EIS.md")
+            record["score"] = load_markdown_from_file(f"{base_name}_score.md")
 
         score_dict = {}
         for record in records:
