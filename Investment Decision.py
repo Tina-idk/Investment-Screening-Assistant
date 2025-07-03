@@ -1,6 +1,7 @@
 import pandas as pd
-
 import streamlit as st
+import plotly.graph_objects as go
+
 st.title("Investment Screening Assistant")
 st.write("Upload company documents and let AI help evaluate whether the business meets your investment criteria!")
 uploaded_file = st.file_uploader("Upload company profile, pitch deck, or business plan", type=["pdf"])
@@ -66,6 +67,26 @@ def extract_scores_only(markdown_table_str):
     df["Score"] = pd.to_numeric(df["Score"].astype(str).str.strip(), errors='coerce')
     df["Score"] = df["Score"].fillna(0)
     return df.set_index("Criteria")["Score"].to_dict()
+
+def plot_radar_chart(scores_dict):
+    fig = go.Figure()
+    for name, scores in scores_dict.items():
+        filtered_scores = {k: v for k, v in scores.items() if k != "Total Score"}
+        criteria = list(filtered_scores.keys())
+        values = list(filtered_scores.values())
+        values += values[:1]  # 形成闭环
+        criteria += criteria[:1]
+        fig.add_trace(go.Scatterpolar(
+            r=values,
+            theta=criteria,
+            fill='toself',
+            name=name
+        ))
+    fig.update_layout(
+        polar=dict(radialaxis=dict(visible=True, range=[0, 5])),
+        showlegend=True
+    )
+    return fig
 
 # AI Analysis
 import google.generativeai as genai
@@ -286,6 +307,10 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
     
         st.markdown("### Score Table Comparison")
         st.dataframe(numeric_df.T, use_container_width=True)
+
+        st.markdown("### Radar Chart: Criteria Overview")
+        radar_fig = plot_radar_chart(score_dict)
+        st.plotly_chart(radar_fig, use_container_width=True)
     
         combo_key = frozenset([record["filename"] for record in records])
         if "multi_conclusions" not in st.session_state:
