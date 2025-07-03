@@ -1,10 +1,6 @@
-import os
 import pandas as pd
+
 import streamlit as st
-
-SAVE_DIR = "saved_results"
-os.makedirs(SAVE_DIR, exist_ok=True)
-
 st.title("Investment Screening Assistant")
 st.write("Upload company documents and let AI help evaluate whether the business meets your investment criteria!")
 uploaded_file = st.file_uploader("Upload company profile, pitch deck, or business plan", type=["pdf"])
@@ -18,18 +14,6 @@ def extract_text(uploaded_file):
         return "\n".join([page.get_text() for page in doc])
     else:
         return "Unsupported file type."
-
-def save_markdown_to_file(content, filename):
-    filepath = os.path.join(SAVE_DIR, filename)
-    with open(filepath, "w", encoding="utf-8") as f:
-        f.write(content)
-
-def load_markdown_from_file(filename):
-    filepath = os.path.join(SAVE_DIR, filename)
-    if not os.path.exists(filepath):
-        return ""
-    with open(filepath, "r", encoding="utf-8") as f:
-        return f.read()
         
 def generate_multi_comparison_conclusion(records):
     model = genai.GenerativeModel(model_name="gemini-1.5-flash")
@@ -241,8 +225,6 @@ if uploaded_file:
             with st.spinner("Analyzing..."):
                 intro_response, SEIS_response, EIS_response, score_response = analyze_with_ai(content)
                 st.session_state["intro_response"] = intro_response
-                st.session_state["SEIS_response"] = SEIS_response
-                st.session_state["EIS_response"] = EIS_response
                 st.session_state["score_response"] = score_response
                 st.session_state["analysis_done"] = True  # ✅ Mark as done
             st.subheader("Company Overview")
@@ -261,24 +243,19 @@ MAX_RECORDS = 10
 # Only allow saving if analysis is completed
 if st.session_state.get("analysis_done", False):
     if st.button("Save Result"):
-        new_record = {
+        st.session_state["records"].append({
             "filename": uploaded_file.name,
             "overview": st.session_state["intro_response"],
             "score": st.session_state["score_response"],
-        }
-        st.session_state["records"].append(new_record)
-    
+        })
         if len(st.session_state["records"]) > MAX_RECORDS:
             st.session_state["records"] = st.session_state["records"][-MAX_RECORDS:]
-    
-        base_name = uploaded_file.name.replace(" ", "_").replace(".", "_")
-        save_markdown_to_file(new_record["overview"], f"{base_name}_overview.md")
-        save_markdown_to_file(new_record["score"], f"{base_name}_score.md")
+        st.success("Result saved!")
 
 if "records" in st.session_state and len(st.session_state["records"]) > 0:
     options = [f"{i+1}. {record['filename']}" for i, record in enumerate(st.session_state["records"])]
     default_selection = options[:2] if len(options) >= 2 else options
-    
+
     selected = st.multiselect(
         "Select companies to compare (up to 10)",
         options,
@@ -290,13 +267,6 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         indices = [int(s.split(".")[0]) - 1 for s in selected]
         records = [st.session_state["records"][i] for i in indices]
     
-        for record in records:
-            base_name = record["filename"].replace(" ", "_").replace(".", "_")
-            record["overview"] = load_markdown_from_file(f"{base_name}_overview.md")
-            record["SEIS"] = load_markdown_from_file(f"{base_name}_SEIS.md")
-            record["EIS"] = load_markdown_from_file(f"{base_name}_EIS.md")
-            record["score"] = load_markdown_from_file(f"{base_name}_score.md")
-
         score_dict = {}
         for record in records:
             score_dict[record["filename"]] = extract_scores_only(record["score"])
