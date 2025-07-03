@@ -274,6 +274,25 @@ if st.session_state.get("analysis_done", False):
         st.success("Result saved!")
 
 if "records" in st.session_state and len(st.session_state["records"]) > 0:
+    # Convert saved scores into a DataFrame for export
+    if st.button("Export All Scores to CSV"):
+        data = []
+        for record in st.session_state["records"]:
+            score_data = extract_scores_only(record["score"])
+            score_data["Company"] = record["filename"]
+            data.append(score_data)
+        df_export = pd.DataFrame(data)
+        df_export = df_export[["Company"] + [col for col in df_export.columns if col != "Company"]]
+        df_export["Recommended"] = ""  
+        st.dataframe(df_export)
+        csv = df_export.to_csv(index=False).encode("utf-8")
+        st.download_button(
+            "📥 Download CSV for ML Training",
+            csv,
+            file_name="investment_scores.csv",
+            mime="text/csv"
+        )
+
     options = [f"{i+1}. {record['filename']}" for i, record in enumerate(st.session_state["records"])]
     default_selection = options[:2] if len(options) >= 2 else options
 
