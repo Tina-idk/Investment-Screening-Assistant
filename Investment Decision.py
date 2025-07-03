@@ -291,6 +291,11 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         score_dict = {}
         for record in records:
             score_dict[record["filename"]] = extract_scores_only(record["score"])
+        score_dict_radar = {
+            name: {k: v for k, v in scores.items() if k != "Total Score"}
+            for name, scores in score_dict.items()
+        }
+
 
         criteria_order = [
             "Annual Revenue", "Growth", "Founders", "Market & Products",
@@ -309,7 +314,7 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         st.dataframe(numeric_df.T, use_container_width=True)
 
         st.markdown("### Radar Chart: Criteria Overview")
-        radar_fig = plot_radar_chart(score_dict)
+        radar_fig = plot_radar_chart(score_dict_radar)
         st.plotly_chart(radar_fig, use_container_width=True)
     
         combo_key = frozenset([record["filename"] for record in records])
