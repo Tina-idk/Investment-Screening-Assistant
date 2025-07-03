@@ -261,19 +261,19 @@ MAX_RECORDS = 10
 # Only allow saving if analysis is completed
 if st.session_state.get("analysis_done", False):
     if st.button("Save Result"):
-        st.session_state["records"].append({
+        new_record = {
             "filename": uploaded_file.name,
             "overview": st.session_state["intro_response"],
             "score": st.session_state["score_response"],
-        })
+        }
+        st.session_state["records"].append(new_record)
+    
         if len(st.session_state["records"]) > MAX_RECORDS:
             st.session_state["records"] = st.session_state["records"][-MAX_RECORDS:]
-            base_name = uploaded_file.name.replace(" ", "_").replace(".", "_")
-        save_markdown_to_file(record["overview"], f"{base_name}_overview.md")
-        save_markdown_to_file(record["SEIS"], f"{base_name}_SEIS.md")
-        save_markdown_to_file(record["EIS"], f"{base_name}_EIS.md")
-        save_markdown_to_file(record["score"], f"{base_name}_score.md")
-        st.success("Result saved locally and in session!")
+    
+        base_name = uploaded_file.name.replace(" ", "_").replace(".", "_")
+        save_markdown_to_file(new_record["overview"], f"{base_name}_overview.md")
+        save_markdown_to_file(new_record["score"], f"{base_name}_score.md")
 
 if "records" in st.session_state and len(st.session_state["records"]) > 0:
     options = [f"{i+1}. {record['filename']}" for i, record in enumerate(st.session_state["records"])]
