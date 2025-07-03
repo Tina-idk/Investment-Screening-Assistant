@@ -292,10 +292,9 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         for record in records:
             score_dict[record["filename"]] = extract_scores_only(record["score"])
         score_dict_radar = {
-            name: {k: v for k, v in scores.items() if k != "Total Score"}
+            name: {k: v for k, v in scores.items() if "total" not in k.lower()}
             for name, scores in score_dict.items()
         }
-
 
         criteria_order = [
             "Annual Revenue", "Growth", "Founders", "Market & Products",
