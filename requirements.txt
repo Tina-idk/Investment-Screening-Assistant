@@ -6,3 +6,4 @@ python-pptx
 pandas
 matplotlib
 numpy
+plotly
