@@ -155,7 +155,7 @@ def analyze_with_ai(text):
     Remember if you think there exist vital drawbacks, please deduct scores and give the reasons in the explanation
     
     Annual Revenue: 
-        Revenue below £1M Portion of revenue is SaaS / Recurring revenue less than 50% → Score 0
+        Revenue below £1M and Portion of revenue is SaaS / Recurring revenue less than 50% → Score 0
         Revenue below £1M or Portion of revenue is SaaS / Recurring revenue less than 50% → Score 1~2
         Revenue below £1M but a clear path to £1m within 6 months and Portion of revenue is SaaS / Recurring revenue (50%) → Score 3~4
         £1M+ revenue and Portion of revenue is SaaS / Recurring revenue (50%) → Score 4~5
@@ -285,7 +285,7 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         numeric_df.loc["Total Score"] = numeric_df.drop("Total Score", errors='ignore').sum()
     
         st.markdown("### Score Table Comparison")
-        st.dataframe(numeric_df, use_container_width=True)
+        st.dataframe(numeric_df.T, use_container_width=True)
     
         combo_key = frozenset([record["filename"] for record in records])
         if "multi_conclusions" not in st.session_state:
