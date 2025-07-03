@@ -66,6 +66,10 @@ def extract_scores_only(markdown_table_str):
         return {}
     df["Score"] = pd.to_numeric(df["Score"].astype(str).str.strip(), errors='coerce')
     df["Score"] = df["Score"].fillna(0)
+    df = df[df["Criteria"].isin([
+        "Annual Revenue", "Growth", "Founders", "Market & Products",
+        "Valuation Discipline", "Cap Table"
+    ])]
     return df.set_index("Criteria")["Score"].to_dict()
 
 def plot_radar_chart(scores_dict):
@@ -279,6 +283,7 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         data = []
         for record in st.session_state["records"]:
             score_data = extract_scores_only(record["score"])
+            score_data["Total Score"] = sum(score_data.values())  # 👈 明确算总分
             score_data["Company"] = record["filename"]
             data.append(score_data)
         df_export = pd.DataFrame(data)
