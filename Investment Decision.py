@@ -1,6 +1,8 @@
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
+from collections import defaultdict
+import numpy as np
 
 st.title("Investment Screening Assistant")
 st.write("Upload company documents and let AI help evaluate whether the business meets your investment criteria!")
@@ -230,7 +232,21 @@ def analyze_with_ai(text):
     Content:
     {final_input}
     """
-    score_response = model.generate_content(score_prompt, generation_config={"temperature": 0}).text
+
+    score_runs = []
+    for _ in range(3):  
+        score_output = model.generate_content(score_prompt, generation_config={"temperature": 0}).text
+        score_runs.append(score_output)
+    
+    score_data = defaultdict(list)
+    for output in score_runs:
+        parsed = extract_scores_only(output)
+        for k, v in parsed.items():
+            score_data[k].append(v)
+    
+    score_response = {k: round(np.mean(v)) for k, v in score_data.items()} 
+    score_response["Total Score"] = sum([v for k, v in averaged_scores.items() if k != "Total Score"])
+
 
     return intro_response, SEIS_response, EIS_response, score_response
 
