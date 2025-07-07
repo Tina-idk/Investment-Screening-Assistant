@@ -3,6 +3,7 @@ import streamlit as st
 import plotly.graph_objects as go
 from collections import defaultdict
 import numpy as np
+import uuid
 
 st.title("Investment Screening Assistant")
 st.write("Upload company documents and let AI help evaluate whether the business meets your investment criteria!")
@@ -223,10 +224,17 @@ if "analysis_done" not in st.session_state:
 
 if "records" not in st.session_state:
     st.session_state["records"] = []
-    
-if uploaded_file:
-    uploaded = genai.upload_file(uploaded_file)
-    st.success("✅ File uploaded successfully.")
+
+if uploaded_file and uploaded_file.name.lower().endswith(".pdf"):
+    try:
+        uploaded = genai.upload_file(
+            uploaded_file.read(),  # 转成 bytes
+            mime_type="application/pdf",
+            file_name=f"{uuid.uuid4()}_{uploaded_file.name}"  # 避免文件名重复
+        )
+        st.success("✅ File uploaded successfully.")
+    except Exception as e:
+        st.error(f"❌ Failed to upload file to Gemini API: {e}")
     
     if st.button("Analyze with AI"):
         with st.spinner("Analyzing..."):
