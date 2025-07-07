@@ -246,7 +246,7 @@ def analyze_with_ai(text):
         for k, v in parsed.items():
             score_data[k].append(v)
     
-    averaged_scores = {k: round(np.mean(v), 2) for k, v in score_data.items()}
+    averaged_scores = {k: round(np.mean(v)) for k, v in score_data.items()}
     averaged_scores["Total Score"] = round(sum([v for k, v in averaged_scores.items() if k != "Total Score"]), 2)
 
 
