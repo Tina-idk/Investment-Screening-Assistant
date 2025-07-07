@@ -7,4 +7,4 @@ pandas
 matplotlib
 numpy
 plotly
-import defaultdict
+defaultdict
