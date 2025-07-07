@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 from collections import defaultdict
-import numpy as np
+import numpy as np 
 
 st.title("Investment Screening Assistant")
 st.write("Upload company documents and let AI help evaluate whether the business meets your investment criteria!")
