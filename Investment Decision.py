@@ -234,20 +234,23 @@ def analyze_with_ai(text):
     """
 
     score_runs = []
-    for _ in range(3):  
-        score_output = model.generate_content(score_prompt, generation_config={"temperature": 0}).text
-        score_runs.append(score_output)
-
+    for _ in range(3):
+        response = model.generate_content(score_prompt, generation_config={"temperature": 0})
+        score_runs.append(response.text)
+    
+    score_response = score_runs[0]
+    
     score_data = defaultdict(list)
     for output in score_runs:
         parsed = extract_scores_only(output)
         for k, v in parsed.items():
             score_data[k].append(v)
     
-    score_response = {k: round(np.mean(v)) for k, v in score_data.items()}
-    score_response["Total Score"] = sum([v for k, v in score_response.items() if k != "Total Score"])
+    averaged_scores = {k: round(np.mean(v), 2) for k, v in score_data.items()}
+    averaged_scores["Total Score"] = round(sum([v for k, v in averaged_scores.items() if k != "Total Score"]), 2)
 
-    return intro_response, SEIS_response, EIS_response, score_response
+
+    return intro_response, SEIS_response, EIS_response, score_response, averaged_scores
 
 # Output
 # Only show "Save Result" if AI analysis has been run
@@ -263,9 +266,10 @@ if uploaded_file:
         st.text_area("Document Preview", content[:2000])
         if st.button("Analyze with AI"):
             with st.spinner("Analyzing..."):
-                intro_response, SEIS_response, EIS_response, score_response = analyze_with_ai(content)
+                intro_response, SEIS_response, EIS_response, score_response, averaged_scores = analyze_with_ai(content)
                 st.session_state["intro_response"] = intro_response
                 st.session_state["score_response"] = score_response
+                st.session_state["averaged_scores"] = averaged_scores
                 st.session_state["analysis_done"] = True  # ✅ Mark as done
             st.subheader("Company Overview")
             st.write(intro_response)
@@ -287,6 +291,7 @@ if st.session_state.get("analysis_done", False):
             "filename": uploaded_file.name,
             "overview": st.session_state["intro_response"],
             "score": st.session_state["score_response"],
+            "avg_score": st.session_state["averaged_scores"]
         })
         if len(st.session_state["records"]) > MAX_RECORDS:
             st.session_state["records"] = st.session_state["records"][-MAX_RECORDS:]
@@ -297,10 +302,15 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
     if st.button("Export All Scores to CSV"):
         data = []
         for record in st.session_state["records"]:
-            score_data = extract_scores_only(record["score"])
-            score_data["Total Score"] = sum(score_data.values())  # 👈 明确算总分
+            avg_score = record.get("avg_score", {})
+            if avg_score:
+                score_data = avg_score.copy()
+            else:
+                score_data = extract_scores_only(record["score"])
+                score_data["Total Score"] = sum(score_data.values())
             score_data["Company"] = record["filename"]
             data.append(score_data)
+            
         df_export = pd.DataFrame(data)
         df_export = df_export[["Company"] + [col for col in df_export.columns if col != "Company"]]
         df_export["Recommended"] = ""  
@@ -329,7 +339,12 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
     
         score_dict = {}
         for record in records:
-            score_dict[record["filename"]] = extract_scores_only(record["score"])
+            avg_score = record.get("avg_score")
+            if avg_score:
+                score_dict[record["filename"]] = avg_score
+            else:
+                score_dict[record["filename"]] = extract_scores_only(record["score"])
+
         score_dict_radar = {
             name: {k: v for k, v in scores.items() if "total" not in k.lower()}
             for name, scores in score_dict.items()
