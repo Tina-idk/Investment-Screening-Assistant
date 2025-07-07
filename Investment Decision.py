@@ -3,13 +3,21 @@ import streamlit as st
 import plotly.graph_objects as go
 from collections import defaultdict
 import numpy as np
-import uuid
 
 st.title("Investment Screening Assistant")
 st.write("Upload company documents and let AI help evaluate whether the business meets your investment criteria!")
 uploaded_file = st.file_uploader("Upload company profile, pitch deck, or business plan", type=["pdf"])
 
-# Text Extraction        
+# Text Extraction
+def extract_text(uploaded_file):
+    file_type = uploaded_file.name.split('.')[-1].lower()
+    if file_type == "pdf":
+        import fitz
+        doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
+        return "\n".join([page.get_text() for page in doc])
+    else:
+        return "Unsupported file type."
+        
 def generate_multi_comparison_conclusion(records):
     model = genai.GenerativeModel(model_name="gemini-1.5-flash")
     companies_text = ""
@@ -89,17 +97,26 @@ def plot_radar_chart(scores_dict):
 # AI Analysis
 import google.generativeai as genai
 genai.configure(api_key=st.secrets["API"])
-def analyze_with_ai(file):
+def analyze_with_ai(text):
     model = genai.GenerativeModel(model_name="gemini-1.5-flash")
+    def split_text(text, chunk_size=3000):
+        return [text[i:i + chunk_size] for i in range(0, len(text), chunk_size)]
+    summaries = []
+    for i, chunk in enumerate(split_text(text)):
+        prompt = f"""
+        This is part {i + 1} of a company document.
+        Try to be concise and accurate. Do not omit any information that may affect investment decisions.
+        Summarize the key points of this section only:
 
-    def prompt_and_ask(prompt):
-        response = model.generate_content([prompt, file], generation_config={"temperature": 0})
-        return response.text
+        {chunk}
+        """
+        response = model.generate_content(prompt, generation_config={"temperature": 0})
+        summaries.append(response.text)
+    final_input = "\n\n".join(summaries)
 
-    # 1. Overview Summary
-    overview_prompt = """
+    intro_prompt = f"""
     You are an investment analyst. Read the company content below and provide:
-
+    
     - Company Description
     - Founders / Team
     - Main product/service
@@ -107,49 +124,60 @@ def analyze_with_ai(file):
     - Historical Financial Performance
     - Market Overview
     - Future Plan
-    - Key Risks and Mitigants
+    - Key Risks and Miligants
+    
+    Content:
+    {final_input}
     """
-    intro_response = prompt_and_ask(overview_prompt)
-
-    # 2. SEIS
-    seis_prompt = """
-    Please assess whether the following company meets the eligibility criteria for the UK Seed Enterprise Investment Scheme (SEIS).
-    Evaluate each criterion separately and respond with ✅ Yes / ❌ No / ⚠️ Uncertain.
-
-    Criteria:
-    - UK-registered company
-    - Age ≤ 2 years
-    - Assets ≤ £350,000
-    - Employees ≤ 25
-    - Risk-to-capital condition
-    - Business operates in a qualifying trade (not financial, real estate, energy generation, etc.)
-    - Funds will be used for eligible business purposes (not repaying debt or buying companies)
-
-    Return a markdown table with Criterion, Status, and Explanation. Conclude whether the company is likely to qualify for SEIS.
-    """
-    SEIS_response = prompt_and_ask(seis_prompt)
-
-    # 3. EIS
-    eis_prompt = """
+    intro_response = model.generate_content(intro_prompt, generation_config={"temperature": 0}).text
+    
+    SEIS_promt = f"""
     Please assess whether the following company meets the eligibility criteria for the UK Enterprise Investment Scheme (EIS).
-    Evaluate each criterion separately and respond with ✅ Yes / ❌ No / ⚠️ Uncertain.
-
-    Criteria:
-    - UK-registered company
-    - Unlisted (or listed on AIM)
-    - Age ≤ 7 years
-    - Assets ≤ £15 million
-    - Employees ≤ 250
-    - Risk-to-capital condition
-    - Business operates in a qualifying trade (not financial, real estate, energy generation, etc.)
-    - Funds will be used for eligible business purposes (not repaying debt or buying companies)
-
-    Return a markdown table with Criterion, Status, and Explanation. Conclude whether the company is likely to qualify for EIS.
+    Evaluate each criterion separately and respond with:
+    ✅ Yes / ❌ No / ⚠️ Uncertain
+    
+    Criterion:
+    UK-registered company
+    Age ≤ 2 years
+    Assets ≤ £350, 000
+    Employees ≤ 25
+    Risk-to-capital condition
+    Business operates in a qualifying trade (not financial, real estate, energy generation, etc.)
+    Funds will be used for eligible business purposes (not repaying debt or buying companies)
+        
+    Return as markdown table, with columns Criterion, Status, Explanation.
+    Conclude whether the company is likely to qualify for EIS.
+    
+    Content:
+    {final_input}
     """
-    EIS_response = prompt_and_ask(eis_prompt)
+    SEIS_response = model.generate_content(SEIS_promt, generation_config={"temperature": 0}).text
 
-    # 4. Investment Criteria Evaluation
-    score_prompt = """
+    EIS_promt = f"""
+    Please assess whether the following company meets the eligibility criteria for the UK Enterprise Investment Scheme (EIS).
+    
+    Evaluate each criterion separately and respond with:
+    ✅ Yes / ❌ No / ⚠️ Uncertain
+    
+    Criterion:
+    UK-registered company
+    Unlisted (or listed on AIM)
+    Age ≤ 7 years
+    Assets ≤ £15 million
+    Employees ≤ 250
+    Risk-to-capital condition
+    Business operates in a qualifying trade (not financial, real estate, energy generation, etc.)
+    Funds will be used for eligible business purposes (not repaying debt or buying companies)
+    
+    Return as markdown table, with columns Criterion, Status, Explanation.
+    Conclude whether the company is likely to qualify for EIS.
+    
+    Content:
+    {final_input}
+    """
+    EIS_response = model.generate_content(EIS_promt, generation_config={"temperature": 0}).text
+
+    score_prompt = f"""
     Evaluate the company based on these criteria and corresponding standards of evaluation after the colon:
     Remember if you think there exist vital drawbacks, please deduct scores and give the reasons in the explanation
     
@@ -184,7 +212,7 @@ def analyze_with_ai(file):
         Market is not growing or shrinking; product lacks innovation; market size is insufficient to support target exit revenue and 3x return → Score 0
         Market shows some growth; product has some innovation; total addressable market (TAM) is reasonably large but expected market share is low (<1%); 3x return logic is unclear or weak → Score 1~3
         Clearly growing market; product is innovative and competitive; large market size (supporting £20m+ revenue); expected to capture 1–3% market share in 3–5 years; clear and reasonable data supporting 3x return → 4~5
-
+        
     Valuation Discipline:
         Valuation is not based on actual trailing 12-month revenue multiples or lacks justification → Score 0
         Valuation mostly based on trailing 12-month revenues, but justification in due diligence (DD) report is weak or incomplete → Score 1~3
@@ -199,21 +227,28 @@ def analyze_with_ai(file):
     - Score out of 5
     - 1-sentence explanation (with numeric data)
 
-    Return a markdown table. Calculate the final score out of 30. Conclude with investment recommendation.
-    """
-    score_runs = [prompt_and_ask(score_prompt) for _ in range(5)]
-    score_response = score_runs[0]
+    Return as markdown table. Calculate the final score out of 30. Conclude with investment recommendation. 
 
-    # 5. 评分平均处理
-    from collections import defaultdict
-    import numpy as np
+    Content:
+    {final_input}
+    """
+
+    score_runs = []
+    for _ in range(5):
+        response = model.generate_content(score_prompt, generation_config={"temperature": 0})
+        score_runs.append(response.text)
+    
+    score_response = score_runs[0]
+    
     score_data = defaultdict(list)
     for output in score_runs:
         parsed = extract_scores_only(output)
         for k, v in parsed.items():
             score_data[k].append(v)
+    
     averaged_scores = {k: round(np.mean(v)) for k, v in score_data.items()}
     averaged_scores["Total Score"] = round(sum([v for k, v in averaged_scores.items() if k != "Total Score"]), 2)
+
 
     return intro_response, SEIS_response, EIS_response, score_response, averaged_scores
 
@@ -224,33 +259,26 @@ if "analysis_done" not in st.session_state:
 
 if "records" not in st.session_state:
     st.session_state["records"] = []
-
-if uploaded_file and uploaded_file.name.lower().endswith(".pdf"):
-    try:
-        uploaded_file.seek(0)
-        uploaded = genai.upload_file(
-            uploaded_file.read(),
-            mime_type="application/pdf"
-        )
-        st.success("✅ File uploaded successfully.")
-    except Exception as e:
-        st.error(f"❌ Failed to upload file to Gemini API: {e}")
     
-    if st.button("Analyze with AI"):
-        with st.spinner("Analyzing..."):
-            intro_response, SEIS_response, EIS_response, score_response, averaged_scores = analyze_with_ai(uploaded)
-            st.session_state["intro_response"] = intro_response
-            st.session_state["score_response"] = score_response
-            st.session_state["averaged_scores"] = averaged_scores
-            st.session_state["analysis_done"] = True
-        st.subheader("Company Overview")
-        st.write(intro_response)
-        st.subheader("SEIS Judgement")
-        st.markdown(SEIS_response)
-        st.subheader("EIS Judgement")
-        st.markdown(EIS_response)
-        st.subheader("Investment Criteria Evaluation")
-        st.markdown(score_response)
+if uploaded_file:
+    content = extract_text(uploaded_file)
+    if content:
+        st.text_area("Document Preview", content[:2000])
+        if st.button("Analyze with AI"):
+            with st.spinner("Analyzing..."):
+                intro_response, SEIS_response, EIS_response, score_response, averaged_scores = analyze_with_ai(content)
+                st.session_state["intro_response"] = intro_response
+                st.session_state["score_response"] = score_response
+                st.session_state["averaged_scores"] = averaged_scores
+                st.session_state["analysis_done"] = True  # ✅ Mark as done
+            st.subheader("Company Overview")
+            st.write(intro_response)
+            st.subheader("SEIS Judgement")
+            st.markdown(SEIS_response)
+            st.subheader("EIS Judgement")
+            st.markdown(EIS_response)
+            st.subheader("Investment Criteria Evaluation")
+            st.markdown(score_response)
     else:
         st.error("Unsupported file type or empty content.")
 
