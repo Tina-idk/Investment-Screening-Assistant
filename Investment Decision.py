@@ -237,16 +237,15 @@ def analyze_with_ai(text):
     for _ in range(3):  
         score_output = model.generate_content(score_prompt, generation_config={"temperature": 0}).text
         score_runs.append(score_output)
-    
+
     score_data = defaultdict(list)
     for output in score_runs:
         parsed = extract_scores_only(output)
         for k, v in parsed.items():
             score_data[k].append(v)
     
-    score_response = {k: round(np.mean(v)) for k, v in score_data.items()} 
-    score_response["Total Score"] = sum([v for k, v in averaged_scores.items() if k != "Total Score"])
-
+    score_response = {k: round(np.mean(v)) for k, v in score_data.items()}
+    score_response["Total Score"] = sum([v for k, v in score_response.items() if k != "Total Score"])
 
     return intro_response, SEIS_response, EIS_response, score_response
 
