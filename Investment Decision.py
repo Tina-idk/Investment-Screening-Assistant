@@ -227,10 +227,10 @@ if "records" not in st.session_state:
 
 if uploaded_file and uploaded_file.name.lower().endswith(".pdf"):
     try:
+        uploaded_file.seek(0)
         uploaded = genai.upload_file(
-            uploaded_file.read(),  # 转成 bytes
-            mime_type="application/pdf",
-            file_name=f"{uuid.uuid4()}_{uploaded_file.name}"  # 避免文件名重复
+            uploaded_file.read(),
+            mime_type="application/pdf"
         )
         st.success("✅ File uploaded successfully.")
     except Exception as e:
