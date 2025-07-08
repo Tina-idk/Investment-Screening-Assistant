@@ -8,6 +8,20 @@ st.title("Investment Screening Assistant")
 st.write("Upload company documents and let AI help evaluate whether the business meets your investment criteria!")
 uploaded_file = st.file_uploader("Upload company profile, pitch deck, or business plan", type=["pdf"])
 
+st.markdown("""
+    <style>
+    @media print {
+        div[data-testid="stButton"],
+        div[data-testid="stDownloadButton"],
+        div[data-testid="stFileUploader"] {
+            display: none !important;
+        }
+        header, footer, .stSidebar {
+            display: none !important;
+        }
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # Text Extraction
 def extract_text(uploaded_file):
