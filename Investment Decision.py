@@ -15,14 +15,23 @@ st.markdown("""
         div[data-testid="stDownloadButton"],
         div[data-testid="stButton"],
         div[data-testid="stMultiSelect"],
+        div[data-testid="stSelectbox"],
         div[data-testid="stTextInput"],
-        div[data-testid="stTextArea"] {
+        div[data-testid="stTextArea"],
+        div[data-testid="stFormSubmitButton"] {
             display: none !important;
+            height: 0px !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
 
-        section.main > div > div > div:nth-child(1),
-        section.main > div > div > div:nth-child(2) {
+        section.main > div > div > div:first-child,
+        section.main > div > div > div:nth-child(2),
+        section.main > div > div > div:has([data-testid="stFileUploader"]),
+        section.main > div > div > div:has([data-testid="stButton"]),
+        section.main > div > div > div:has([data-testid="stMultiSelect"]) {
             display: none !important;
+            height: 0px !important;
         }
 
         header, footer, .stSidebar {
@@ -30,11 +39,12 @@ st.markdown("""
         }
 
         @page {
-            margin: 10mm;
+            margin: 12mm;
         }
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 # Text Extraction
 def extract_text(uploaded_file):
