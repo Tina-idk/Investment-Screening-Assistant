@@ -10,14 +10,6 @@ uploaded_file = st.file_uploader("Upload company profile, pitch deck, or busines
 
 st.markdown("""
     <style>
-        .block-container {
-                max-width: 800px;
-                margin: auto;
-                padding-top: 2rem;
-            }
-            .st-emotion-cache-1cypcdb {
-                padding-top: 1rem;
-            }
     @media print {
         button, .stButton, .stDownloadButton, .stFileUploader, .stTextInput, .stTextArea, .stMultiSelect, .stCheckbox {
             display: none !important;
