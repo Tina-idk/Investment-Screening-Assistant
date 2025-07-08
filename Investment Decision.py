@@ -13,15 +13,29 @@ st.markdown("""
     @media print {
         div[data-testid="stButton"],
         div[data-testid="stDownloadButton"],
-        div[data-testid="stFileUploader"] {
+        div[data-testid="stFileUploader"],
+        div[data-testid="stMultiSelect"],
+        div[data-testid="stTextArea"],
+        div[data-testid="stTextInput"] {
             display: none !important;
         }
+
         header, footer, .stSidebar {
             display: none !important;
+        }
+
+        div[role="listbox"],
+        div[role="combobox"] {
+            display: none !important;
+        }
+
+        @page {
+            margin: 10mm;
         }
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 # Text Extraction
 def extract_text(uploaded_file):
