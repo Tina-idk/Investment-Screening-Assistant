@@ -8,35 +8,6 @@ st.title("Investment Screening Assistant")
 st.write("Upload company documents and let AI help evaluate whether the business meets your investment criteria!")
 uploaded_file = st.file_uploader("Upload company profile, pitch deck, or business plan", type=["pdf"])
 
-st.markdown("""
-    <style>
-    @media print {
-        div[data-testid="stButton"],
-        div[data-testid="stDownloadButton"],
-        div[data-testid="stFileUploader"],
-        div[data-testid="stMultiSelect"],
-        div[data-testid="stTextArea"],
-        div[data-testid="stTextInput"] {
-            display: none !important;
-        }
-
-        header, footer, .stSidebar {
-            display: none !important;
-        }
-
-        div[role="listbox"],
-        div[role="combobox"] {
-            display: none !important;
-        }
-
-        @page {
-            margin: 10mm;
-        }
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-
 # Text Extraction
 def extract_text(uploaded_file):
     file_type = uploaded_file.name.split('.')[-1].lower()
@@ -263,7 +234,7 @@ def analyze_with_ai(text):
     """
 
     score_runs = []
-    for _ in range(3):
+    for _ in range(5):
         response = model.generate_content(score_prompt, generation_config={"temperature": 0})
         score_runs.append(response.text)
     
@@ -291,8 +262,8 @@ if "records" not in st.session_state:
     
 if uploaded_file:
     content = extract_text(uploaded_file)
-    st.text_area("Document Preview", content[:2000])
     if content:
+        st.text_area("Document Preview", content[:2000])
         if st.button("Analyze with AI"):
             with st.spinner("Analyzing..."):
                 intro_response, SEIS_response, EIS_response, score_response, averaged_scores = analyze_with_ai(content)
@@ -311,7 +282,7 @@ if uploaded_file:
     else:
         st.error("Unsupported file type or empty content.")
 
-MAX_RECORDS = 20
+MAX_RECORDS = 10
 
 # Only allow saving if analysis is completed
 if st.session_state.get("analysis_done", False):
@@ -356,7 +327,7 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
     default_selection = options[:2] if len(options) >= 2 else options
 
     selected = st.multiselect(
-        "Select companies to compare (up to 20)",
+        "Select companies to compare (up to 10)",
         options,
         default=default_selection,
         max_selections=10
@@ -429,6 +400,7 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
         
 else:
     st.info("Please upload at least one company file.")
+
 
 if st.button("Clear All Saved Analyses"):
     st.session_state["records"] = []
