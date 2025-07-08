@@ -39,10 +39,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-    }
-    </style>
-""", unsafe_allow_html=True)
-
 # Text Extraction
 def extract_text(uploaded_file):
     file_type = uploaded_file.name.split('.')[-1].lower()
