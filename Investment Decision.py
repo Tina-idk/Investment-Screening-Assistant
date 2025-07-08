@@ -11,36 +11,17 @@ uploaded_file = st.file_uploader("Upload company profile, pitch deck, or busines
 st.markdown("""
     <style>
     @media print {
-        div[data-testid="stFileUploader"],
-        div[data-testid="stDownloadButton"],
         div[data-testid="stButton"],
-        div[data-testid="stMultiSelect"],
-        div[data-testid="stSelectbox"],
-        div[data-testid="stTextInput"],
-        div[data-testid="stTextArea"],
-        div[data-testid="stFormSubmitButton"] {
-            display: none !important;
-            height: 0 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        div:has(> label:has-text("Document Preview")) {
+        div[data-testid="stDownloadButton"],
+        div[data-testid="stFileUploader"] {
             display: none !important;
         }
-
         header, footer, .stSidebar {
             display: none !important;
-        }
-
-        @page {
-            margin: 12mm;
         }
     }
     </style>
 """, unsafe_allow_html=True)
-
-
 
 # Text Extraction
 def extract_text(uploaded_file):
