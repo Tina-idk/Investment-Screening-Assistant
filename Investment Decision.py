@@ -276,6 +276,7 @@ if "records" not in st.session_state:
     st.session_state["records"] = []
     
 if uploaded_file:
+    st.text_area("Document Preview", content[:2000])
     content = extract_text(uploaded_file)
     if content:
         if st.button("Analyze with AI"):
@@ -341,7 +342,7 @@ if "records" in st.session_state and len(st.session_state["records"]) > 0:
     default_selection = options[:2] if len(options) >= 2 else options
 
     selected = st.multiselect(
-        "Select companies to compare (up to 10)",
+        "Select companies to compare (up to 20)",
         options,
         default=default_selection,
         max_selections=10
