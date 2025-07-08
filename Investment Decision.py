@@ -20,18 +20,13 @@ st.markdown("""
         div[data-testid="stTextArea"],
         div[data-testid="stFormSubmitButton"] {
             display: none !important;
-            height: 0px !important;
+            height: 0 !important;
             margin: 0 !important;
             padding: 0 !important;
         }
 
-        section.main > div > div > div:first-child,
-        section.main > div > div > div:nth-child(2),
-        section.main > div > div > div:has([data-testid="stFileUploader"]),
-        section.main > div > div > div:has([data-testid="stButton"]),
-        section.main > div > div > div:has([data-testid="stMultiSelect"]) {
+        div:has(> label:has-text("Document Preview")) {
             display: none !important;
-            height: 0px !important;
         }
 
         header, footer, .stSidebar {
@@ -44,6 +39,7 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 
 # Text Extraction
