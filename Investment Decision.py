@@ -19,9 +19,6 @@ st.markdown("""
         header, footer, .stSidebar {
             display: none !important;
         }
-        div[data-testid="stTextArea"][id^="preview"] {
-            display: none !important;
-        }
     }
     </style>
 """, unsafe_allow_html=True)
