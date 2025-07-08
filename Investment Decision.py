@@ -11,21 +11,21 @@ uploaded_file = st.file_uploader("Upload company profile, pitch deck, or busines
 st.markdown("""
     <style>
     @media print {
-        div[data-testid="stButton"],
-        div[data-testid="stDownloadButton"],
         div[data-testid="stFileUploader"],
+        div[data-testid="stDownloadButton"],
+        div[data-testid="stButton"],
         div[data-testid="stMultiSelect"],
-        div[data-testid="stTextArea"],
-        div[data-testid="stTextInput"] {
+        div[data-testid="stTextInput"],
+        div[data-testid="stTextArea"] {
+            display: none !important;
+        }
+
+        section.main > div > div > div:nth-child(1),
+        section.main > div > div > div:nth-child(2) {
             display: none !important;
         }
 
         header, footer, .stSidebar {
-            display: none !important;
-        }
-
-        div[role="listbox"],
-        div[role="combobox"] {
             display: none !important;
         }
 
