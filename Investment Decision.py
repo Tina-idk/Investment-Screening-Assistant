@@ -405,6 +405,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from datetime import datetime
 from io import BytesIO
+import tempfile
 
 def export_report_pdf(record):
     buffer = BytesIO()
