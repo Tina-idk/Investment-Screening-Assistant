@@ -99,6 +99,7 @@ from reportlab.pdfgen import canvas
 from datetime import datetime
 from io import BytesIO
 import tempfile
+from textwrap import wrap
 
 def export_report_pdf(record):
     buffer = BytesIO()
@@ -117,9 +118,16 @@ def export_report_pdf(record):
     c.drawString(50, height - 100, "1. Company Overview")
     c.setFont("Helvetica", 9)
     text = c.beginText(50, height - 115)
-    for line in record["overview"].split("\n"):
-        text.textLine(line.strip())
+    text.setFont("Helvetica", 9)
+    max_width_chars = 100 
+    wrapped_lines = []
+    for paragraph in record["overview"].split("\n"):
+        wrapped_lines += wrap(paragraph.strip(), width=max_width_chars)
+        wrapped_lines.append("") 
+    for line in wrapped_lines:
+        text.textLine(line)
     c.drawText(text)
+
 
     # Section 2: Score Table
     c.setFont("Helvetica-Bold", 12)
