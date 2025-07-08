@@ -13,23 +13,34 @@ st.markdown("""
     @media print {
         button, .stButton, .stDownloadButton, .stFileUploader, .stTextInput, .stTextArea, .stMultiSelect, .stCheckbox {
             display: none !important;
-            visibility: hidden !important;
-            height: 0 !important;
-            margin: 0 !important;
-            padding: 0 !important;
         }
-        .st-emotion-cache-ocqkz7,  /* Streamlit Button wrapper */
-        .st-emotion-cache-1gulkj5,  /* FileUploader wrapper */
-        .st-emotion-cache-1n76uvr,  /* Markdown wrapper */
-        .st-emotion-cache-1avcm0n { 
+
+        div[data-testid="stButton"],
+        div[data-testid="stDownloadButton"],
+        div[data-testid="stFileUploader"],
+        div[data-testid="stTextInput"],
+        div[data-testid="stTextArea"],
+        div[data-testid="stMultiSelect"],
+        div[data-testid="stCheckbox"] {
+            display: none !important;
             height: 0 !important;
-            overflow: hidden !important;
-            margin: 0 !important;
             padding: 0 !important;
+            margin: 0 !important;
+            overflow: hidden !important;
+        }
+
+        div[class^="st-emotion-cache"]:has(div[data-testid="stButton"]),
+        div[class^="st-emotion-cache"]:has(div[data-testid="stDownloadButton"]) {
+            display: none !important;
+            height: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: hidden !important;
         }
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 # Text Extraction
 def extract_text(uploaded_file):
