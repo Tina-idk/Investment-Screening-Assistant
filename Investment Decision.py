@@ -11,36 +11,17 @@ uploaded_file = st.file_uploader("Upload company profile, pitch deck, or busines
 st.markdown("""
     <style>
     @media print {
-        button, .stButton, .stDownloadButton, .stFileUploader, .stTextInput, .stTextArea, .stMultiSelect, .stCheckbox {
-            display: none !important;
-        }
-
         div[data-testid="stButton"],
         div[data-testid="stDownloadButton"],
-        div[data-testid="stFileUploader"],
-        div[data-testid="stTextInput"],
-        div[data-testid="stTextArea"],
-        div[data-testid="stMultiSelect"],
-        div[data-testid="stCheckbox"] {
+        div[data-testid="stFileUploader"] {
             display: none !important;
-            height: 0 !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            overflow: hidden !important;
         }
-
-        div[class^="st-emotion-cache"]:has(div[data-testid="stButton"]),
-        div[class^="st-emotion-cache"]:has(div[data-testid="stDownloadButton"]) {
+        header, footer, .stSidebar {
             display: none !important;
-            height: 0 !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            overflow: hidden !important;
         }
     }
     </style>
 """, unsafe_allow_html=True)
-
 
 # Text Extraction
 def extract_text(uploaded_file):
