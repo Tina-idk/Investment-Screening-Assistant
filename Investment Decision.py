@@ -10,10 +10,35 @@ uploaded_file = st.file_uploader("Upload company profile, pitch deck, or busines
 
 st.markdown("""
     <style>
+        .block-container {
+                max-width: 800px;
+                margin: auto;
+                padding-top: 2rem;
+            }
+            .st-emotion-cache-1cypcdb {
+                padding-top: 1rem;
+            }
     @media print {
-        button, .stDownloadButton, .stFileUploader, .stTextInput, .stTextArea {
+        button, .stButton, .stDownloadButton, .stFileUploader, .stTextInput, .stTextArea, .stMultiSelect, .stCheckbox {
             display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
+        .st-emotion-cache-ocqkz7,  /* Streamlit Button wrapper */
+        .st-emotion-cache-1gulkj5,  /* FileUploader wrapper */
+        .st-emotion-cache-1n76uvr,  /* Markdown wrapper */
+        .st-emotion-cache-1avcm0n { 
+            height: 0 !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+    }
+    </style>
+""", unsafe_allow_html=True)
+
     }
     </style>
 """, unsafe_allow_html=True)
