@@ -278,7 +278,6 @@ if "records" not in st.session_state:
 if uploaded_file:
     content = extract_text(uploaded_file)
     if content:
-        st.text_area("Document Preview", content[:2000])
         if st.button("Analyze with AI"):
             with st.spinner("Analyzing..."):
                 intro_response, SEIS_response, EIS_response, score_response, averaged_scores = analyze_with_ai(content)
@@ -297,7 +296,7 @@ if uploaded_file:
     else:
         st.error("Unsupported file type or empty content.")
 
-MAX_RECORDS = 10
+MAX_RECORDS = 20
 
 # Only allow saving if analysis is completed
 if st.session_state.get("analysis_done", False):
