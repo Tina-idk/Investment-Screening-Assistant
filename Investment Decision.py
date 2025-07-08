@@ -234,7 +234,7 @@ def analyze_with_ai(text):
     """
 
     score_runs = []
-    for _ in range(5):
+    for _ in range(3):
         response = model.generate_content(score_prompt, generation_config={"temperature": 0})
         score_runs.append(response.text)
     
