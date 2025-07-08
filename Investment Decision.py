@@ -276,8 +276,8 @@ if "records" not in st.session_state:
     st.session_state["records"] = []
     
 if uploaded_file:
-    st.text_area("Document Preview", content[:2000])
     content = extract_text(uploaded_file)
+    st.text_area("Document Preview", content[:2000])
     if content:
         if st.button("Analyze with AI"):
             with st.spinner("Analyzing..."):
